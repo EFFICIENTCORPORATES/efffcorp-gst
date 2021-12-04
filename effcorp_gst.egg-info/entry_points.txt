@@ -1,0 +1,3 @@
+[console_scripts]
+gst = gst.__main__:main
+
