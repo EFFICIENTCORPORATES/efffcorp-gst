@@ -13,32 +13,29 @@ warnings.filterwarnings('ignore')
 
 
 
-
-
-
 def gstchecksum(gst_no):
 
 
-"""
-This function gstchecksum will check the last digit of the gst number and return whether the Check sum matches or not
+    """
+    This function gstchecksum will check the last digit of the gst number and return whether the Check sum matches or not
 
-Output will be given as "Check Sum MATCH" or "Check Sum MISMATCH"
+    Output will be given as "Check Sum MATCH" or "Check Sum MISMATCH"
 
-:param gst_no: This is the only argument that needs to be given. It is a mandatory Argument.The argument must be 15 digit long
+    :param gst_no: This is the only argument that needs to be given. It is a mandatory Argument.The argument must be 15 digit long
 
-:type gst_no: This parameter must be a string and must be 15 digit long
+    :type gst_no: This parameter must be a string and must be 15 digit long
 
-:return : The function will return only one of two values a) Check Sum MATCH & b) Check Sum MISMATCH
+    :return : The function will return only one of two values a) Check Sum MATCH & b) Check Sum MISMATCH
 
-:raises: There are two errors that will be raised by the Function 
-        1. Type Error: If the parameter entered is not a string, then this error is raised
-        2. Exception: If the parameter entered is not 15 digit long, then Exception is raised
+    :raises: There are two errors that will be raised by the Function 
+            1. Type Error: If the parameter entered is not a string, then this error is raised
+            2. Exception: If the parameter entered is not 15 digit long, then Exception is raised
 
-:see also: To know how the GST Ceck sum is calculated , see the alogorithm behind the last digit
+    :see also: To know how the GST Ceck sum is calculated , see the alogorithm behind the last digit
 
 
 
-"""
+    """
 
     charlist=[char for char in gst_no.upper()]
 
@@ -116,26 +113,26 @@ Output will be given as "Check Sum MATCH" or "Check Sum MISMATCH"
 def getgstcheck(number):
 
 
-"""
-This function getgstcheck will give the last digit of the gst number
+    """
+    This function getgstcheck will give the last digit of the gst number
 
-Output will be given as the last digit which should be as per the given 14 digit number
+    Output will be given as the last digit which should be as per the given 14 digit number
 
-:param number: This is the only argument that needs to be given. It is a mandatory Argument.The argument must beat least 14 digit long
+    :param number: This is the only argument that needs to be given. It is a mandatory Argument.The argument must beat least 14 digit long
 
-:type gst_no: This parameter must be a string and must be at least digit long
+    :type gst_no: This parameter must be a string and must be at least digit long
 
-:return : The function will return the correct last digit of the given gst number
+    :return : The function will return the correct last digit of the given gst number
 
-:raises: There are two errors that will be raised by the Function 
-        1. Type Error: If the parameter entered is not a string, then this error is raised
-        2. Exception: If the parameter entered is not at least 14 digit long, then Exception is raised
+    :raises: There are two errors that will be raised by the Function 
+            1. Type Error: If the parameter entered is not a string, then this error is raised
+            2. Exception: If the parameter entered is not at least 14 digit long, then Exception is raised
 
-:see also: To know how the GST Ceck sum is calculated , see the alogorithm behind the last digit
+    :see also: To know how the GST Ceck sum is calculated , see the alogorithm behind the last digit
 
 
 
-"""
+    """
 
     charlist=[char for char in number.upper()]
 
@@ -151,11 +148,12 @@ Output will be given as the last digit which should be as per the given 14 digit
         
         print ("Please ensure that the input is at least 14 digit long")
         
-        break
+        pass
 
     else:
         
-        continue
+        pass
+        
 
 
     for i in charlist[0:14:1]:
@@ -202,20 +200,20 @@ Output will be given as the last digit which should be as per the given 14 digit
 
 def gstinvcheck(a):
 
-"""
-This function will check whether the invoice number entered is correct or not.
+    """
+    This function will check whether the invoice number entered is correct or not.
 
-As per GST rules, the Invoice number must be maximum 15 digit long
+    As per GST rules, the Invoice number must be maximum 15 digit long
 
-:param a: this must be the GST  Invoice number 
+    :param a: this must be the GST  Invoice number 
 
-:param a type: The Type of parameter must be a string. However, in the functionit is converting any parameter into a string through str() method
+    :param a type: The Type of parameter must be a string. However, in the functionit is converting any parameter into a string through str() method
 
-:return : it return one of 2 output  a) Invoice Number Valid or b) Invoice Number Invalid
+    :return : it return one of 2 output  a) Invoice Number Valid or b) Invoice Number Invalid
 
 
 
-"""
+    """
 
     try:
         length=len(str(a))
@@ -238,27 +236,40 @@ def extract_pan(gst_no):
 
 
 
-"""
-This fucntion will extract the PAN number from the provided GST_No
+    """
+    This function will extract the PAN number from the provided GST_No
 
-:param gst_no: This function requires only one parameter. ie the GST No
+    :param gst_no: This function requires only one parameter. ie the GST No
 
-:param gst_no type: The type of the parameter must be a string
+    :param gst_no type: The type of the parameter must be a string
 
-:return :The function will return a string which is the PAN Number
+    :return :The function will return a string which is the PAN Number
 
-:SeeAlso : The PAN number is the 3rd Character to 12th Character of the GST Number
+    :SeeAlso : The PAN number is the 3rd Character to 12th Character of the GST Number
 
 
 
-"""
-    if not type(gst_no) is str:
-        raise TypeError("Only strings are allowed")
+    """
+    try:
+        if not type(gst_no) is str:
+            raise TypeError("Only strings are allowed")
+
+        else:
+            pass
+            
+
+    except:
+        pass
+        
 
 
     try:
         if len(gst_no)<15:
             raise Exception("Please ensure that the input is 15 digit long")
+
+        else:
+            pass
+            
     except:
         pass
 
@@ -274,39 +285,39 @@ This fucntion will extract the PAN number from the provided GST_No
 
 
 def gstr2a_merge(filepath):
-"""
-This is a super Useful Function for merging all the GSTR2A files kept in a folder.
+    """
+    This is a super useful Function for merging all the GSTR2A files kept in a folder.
 
 
-:Param filepath: The function takes only one parameter which is the Compelte File Path to any one GSTR2A file in that folder
+    :Param filepath: The function takes only one parameter which is the Compelte File Path to any one GSTR2A file in that folder
 
-:Param type : The type of the argument should be the complete path to the excel file of the GSTR2A , till the extension 
+    :Param type : The type of the argument should be the complete path to the excel file of the GSTR2A , till the extension 
 
-:return : The function will return a merged Excel File by merging all the GSTR2A Sheets i.e the B2B, B2BA, CDNR, CDNRA
+    :return : The function will return a merged Excel File by merging all the GSTR2A Sheets i.e the B2B, B2BA, CDNR, CDNRA
 
-:Warnings:  Please note that only one argument needs to be passed
-            
-            The Function will auto read all other files which are there in the folder
+    :Warnings:  Please note that only one argument needs to be passed
+                
+                The Function will auto read all other files which are there in the folder
 
-            Please ensure that the particular folder only has the GSTR2A files that you want to combine. 
+                Please ensure that the particular folder only has the GSTR2A files that you want to combine. 
 
-            There should not be any other files as this function will read all the files in that folder whether or not they are GSTR2A files
+                There should not be any other files as this function will read all the files in that folder whether or not they are GSTR2A files
 
-:See Also: Just a snippet of how this function works
+    :See Also: Just a snippet of how this function works
 
-            The code will forst loop through all the B2B files of the folder and then B2B A, then CDNR and then CDNRA.
+                The code will first loop through all the B2B files of the folder and then B2B A, then CDNR and then CDNRA.
 
-            After looping through all the files, this will first make 4 different sheets of these 4 types
+                After looping through all the files, this will first make 4 different sheets of these 4 types
 
-            Then it will make a All Combined Files by merging all the B2B, B2BA, CDNR and CDNRA
+                Then it will make a All Combined Files by merging all the B2B, B2BA, CDNR and CDNRA
 
-            Also, as an additional analysis, this will make 3 different sheets a) RCM Cases b) GSTR-1 Filing Status as No c) tax Zero cases
+                Also, as an additional analysis, this will make 3 different sheets a) RCM Cases b) GSTR-1 Filing Status as No c) tax Zero cases
 
-            NOw, as per the GST Act, and Rule 36, for claiming the ITC, GSTR -1 Fling status to be Y and RCM should be N
+                NOw, as per the GST Act, and Rule 36, for claiming the ITC, GSTR -1 Fling status to be Y and RCM should be N
 
 
 
-"""
+    """
 
     import pandas as pd
     import glob
@@ -342,7 +353,7 @@ This is a super Useful Function for merging all the GSTR2A files kept in a folde
     # A.1 : This will iterate through the B2B file
 
 
-    print(f"The files that will be combined are {filenames}")
+    print(f"The files that will be combined are \n {filenames}")
 
 
     print("We are working on B2B sheet of all the monthly GSTR2A..Please wait...")
@@ -654,7 +665,7 @@ This is a super Useful Function for merging all the GSTR2A files kept in a folde
     extension = os.path.splitext(filepath)[1]
     filename = os.path.splitext(filepath)[0]
     pth = os.path.dirname(filepath)
-    newfile = os.path.join(pth, filename + 'GSTR2A_all_combined' + extension)
+    newfile = os.path.join(pth, "Merged" + 'GSTR2A_all_Files_by_Effcorp' + extension)
 
     writer = pd.ExcelWriter(newfile, engine='openpyxl')
 
@@ -779,6 +790,7 @@ This is a super Useful Function for merging all the GSTR2A files kept in a folde
     df14[titles].to_excel(writer, sheet_name="Working_Cases")
 
     writer.save()
+    writer.close()
 
     print(f"All files have been combined and a single file named {newfile} has been created")
 
@@ -792,31 +804,31 @@ def download(pth=os.getcwd()):
 
 
 
-"""
-This is a function to download the GSTR2A & ITR format and also instructions to use this utility
+    """
+    This is a function to download the GSTR2A & ITR format and also instructions to use this utility
 
 
-:param pth: This takes a single argument which is a pathn which the user wants to store the Format files
+    :param pth: This takes a single argument which is a pathn which the user wants to store the Format files
 
-:param Type: This parameter is a optional argument
+    :param Type: This parameter is a optional argument
 
-            In case the parameter is not provided, the current working directory is taken as the Pth and the fomrat os downloaded in that folder
-
-
-:return writer: This function will return a excel file which has a format for the reconciliation of the GSTR2A and the ITR
-
-This is a dependednt function for the next main function reco_itr_2a. 
-
-There are mandatory columns and it has to be ensured that the names of the Mandatory columns are same as in the format
-
-There is no requirment for the sequence of the columns to be same as the Format
-
-The excel file in which the data is kept can hae multiple sheets , but the nme of the sheet should be same as in the format
-
-For more details, refer the Sheet "Important_Checklist" downloaded in the format
+                In case the parameter is not provided, the current working directory is taken as the Pth and the fomrat os downloaded in that folder
 
 
-"""
+    :return writer: This function will return a excel file which has a format for the reconciliation of the GSTR2A and the ITR
+
+    This is a dependednt function for the next main function reco_itr_2a. 
+
+    There are mandatory columns and it has to be ensured that the names of the Mandatory columns are same as in the format
+
+    There is no requirment for the sequence of the columns to be same as the Format
+
+    The excel file in which the data is kept can hae multiple sheets , but the nme of the sheet should be same as in the format
+
+    For more details, refer the Sheet "Important_Checklist" downloaded in the format
+
+
+    """
 
 
 
@@ -826,7 +838,7 @@ For more details, refer the Sheet "Important_Checklist" downloaded in the format
 
 
     fullpath1 = pth + "\\" + "Formats.xlsx"
-    print(fullpath1)
+    print(f"The path selected is {fullpath1}")
 
     writer = pd.ExcelWriter(fullpath1, engine='xlsxwriter', options={'strings_to_formulas': True})
 
@@ -843,7 +855,7 @@ For more details, refer the Sheet "Important_Checklist" downloaded in the format
 
     dict3={"Things to ensure before Running the Program":[" ","Keep GSTR2A and ITR in different Folders ","In that Folder , there should not be any other excel files",
     "Format of the ITR & GSTR2A can be as per the user ","However, below points to be taken care","The name of the Sheet having the  ITR should be Main_ITR_Format ",
-    "The name of the Sheet having the Consolidated GSTR2A should be Main_2A_Format "," ","There are 6 Mandatory columns in both GSTR2A and ITR ","The Name to be assigned to these 6 Mandatory columns must be same as in the format",
+    "The name of the Sheet having the Consolidated GSTR2A should be Main_2A_Format "," ","There are 6 Mandatory columns in  GSTR2A and 4 Mandatory columns in ITR ","The Name to be assigned to these 6 Mandatory columns must be same as in the format",
     "In ITR , Mandatory columns are Vendor_GST_REG , Invoice_Number, Invoice_Date_Text, Total_Tax","Even the upper and Lower case should be same as in the Format",
     "In GSTR2A , Mandatory columns are GSTIN_of_Supplier , Inv_CN_DN_Number_Final, Inv_CN_DN_Date_Text, Total_Tax,Supply_Attract_Reverse_Charge,GSTR_1_5_Filing_Status","Take care of the Upper and Lower case and special Character",
     "The sequence of the Columns is not relevant. User can maintain the Sequence of the columns as per his own convinience","The ITR or GSTR2A file can also have multiple other sheets as per need of user , but relevant data for matching should be in one sheet only .",
@@ -856,7 +868,11 @@ For more details, refer the Sheet "Important_Checklist" downloaded in the format
 
     writer.save()
 
+    writer.close()
+
     print(f'The Formats have been saved in below path \n {fullpath1}\n ')
+
+    return (writer)
 
 
 
@@ -865,67 +881,67 @@ For more details, refer the Sheet "Important_Checklist" downloaded in the format
 
 def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
-"""
-This fucntion is for reconciling the GSTr2A and the ITR
+    """
+    This fucntion is for reconciling the GSTr2A and the ITR
 
-Please download the Format using the Function download and go through the Important Checklist
+    Please download the Format using the Function download and go through the Important Checklist
 
-This function takes the 3 parameters. Two are Mandatory and 1 is optional
+    This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
-:param files_itr: This argument should be the complete path to the ITR file which is as per the format 
+    :param files_itr: This argument should be the complete path to the ITR file which is as per the format 
 
-                Please ensure to provide the compelte filepath of ITR till the extension
+                    Please ensure to provide the compelte filepath of ITR till the extension
 
-:param files_con2a : This is the argument for the complete filepath of the GSTR2A file.
-                    
-                    Please ensure to gve the complete file path till the extension
+    :param files_con2a : This is the argument for the complete filepath of the GSTR2A file.
+                        
+                        Please ensure to gve the complete file path till the extension
 
-:param tol_limit : This is also next important parameter. This is the Tolerance limit.
+    :param tol_limit : This is also next important parameter. This is the Tolerance limit.
 
-                    If a invoice is booked with Tax of Rs 12,300 , but the same invoice is given in GSTR2A as Rs 12450.
+                        If a invoice is booked with Tax of Rs 12,300 , but the same invoice is given in GSTR2A as Rs 12450.
 
-                    Now, there is a difference of Rs 150. Now , if the tolerance limit is kept as 100, then this case will be considered NOT MATCHING
+                        Now, there is a difference of Rs 150. Now , if the tolerance limit is kept as 100, then this case will be considered NOT MATCHING
 
-                    But, if the tolerance limit is kept as 200, then this case will be considered as a match
+                        But, if the tolerance limit is kept as 200, then this case will be considered as a match
 
-                    Use can provide the Tolerance limit value based on the size of the client
-
-
-                    If no parameter is provided , then the 100 is taken as the Tolerance limit
-
-:return output : This function will return 2 files 1) Summary.xlsx and 2) Working.xlsx
-
-                These 2 files will be stored in the folder where the Combined GSTR2A is stored
-
-                The Summary fil will ave a snapshot of the matching exercise and will tell the Total cases, matched cases and the unmatched cases
-
-                The matching is done under 7 different categories
-
-                a) GST+INV NO + INV Date +Tax Amount >> Complete 3 way match
-
-                b)GST + INV NO +Tax Amount >> Complete 2 way match
-
-                c)GST + INV Date +Tax Amount >> Complete 2 way match
-
-                d)PAN+ INV NO + INV Date +Tax Amount >> Complete 3 way match
-
-                e)PAN+INV NO  +Tax Amount >> Complete 2 way match
-
-                f) PAN + INV Date +Tax Amount >> Complete 2 way match
-
-                g) Fuzzy Look up Match: These are the cases with 90% Invoice Number and 100% PAN Number matching . Just the Invoice Number matches , not the Tax Amount or date
+                        Use can provide the Tolerance limit value based on the size of the client
 
 
-                Also, the Unmatched cases of ITR will be bifurcated into 3 difefrent buckets 
+                        If no parameter is provided , then the 100 is taken as the Tolerance limit
 
-                1. Cases whose GST/PAN is not present in GSTR2A (No Scope of Mathing)
-                2. Cases where the GST Number entered in Purchase Register is INVALID
-                3. Cases where the Invoice Number is Invalid
-                4. Other Remaining Unmatched Cases 
+    :return output : This function will return 2 files 1) Summary.xlsx and 2) Working.xlsx
+
+                    These 2 files will be stored in the folder where the Combined GSTR2A is stored
+
+                    The Summary fil will ave a snapshot of the matching exercise and will tell the Total cases, matched cases and the unmatched cases
+
+                    The matching is done under 7 different categories
+
+                    a) GST+INV NO + INV Date +Tax Amount >> Complete 3 way match
+
+                    b)GST + INV NO +Tax Amount >> Complete 2 way match
+
+                    c)GST + INV Date +Tax Amount >> Complete 2 way match
+
+                    d)PAN+ INV NO + INV Date +Tax Amount >> Complete 3 way match
+
+                    e)PAN+INV NO  +Tax Amount >> Complete 2 way match
+
+                    f) PAN + INV Date +Tax Amount >> Complete 2 way match
+
+                    g) Fuzzy Look up Match: These are the cases with 90% Invoice Number and 100% PAN Number matching . Just the Invoice Number matches , not the Tax Amount or date
+
+
+                    Also, the Unmatched cases of ITR will be bifurcated into 3 difefrent buckets 
+
+                    1. Cases whose GST/PAN is not present in GSTR2A (No Scope of Mathing)
+                    2. Cases where the GST Number entered in Purchase Register is INVALID
+                    3. Cases where the Invoice Number is Invalid
+                    4. Other Remaining Unmatched Cases 
 
 
 
-"""
+    """
 
 
 
@@ -1016,7 +1032,7 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
     ws["F1"].value = f"Tolerance Limit was {tol_limit}"
 
-    gstr2a = pd.read_excel(files_con2a, sheet_name="Main_2A_Format",dtype={"Inv_CN_DN_Number_Final":str, "Inv_CN_DN_Date_Text":str, "Total_Tax":int})
+    gstr2a = pd.read_excel(files_con2a, sheet_name="Main_2A_Format",dtype={"Inv_CN_DN_Number_Final":str, "Inv_CN_DN_Date_Text":str, "Total_Tax":float})
 
     try:
         gstr2a['Inv_CN_DN_Number_Finall'] = gstr2a["Inv_CN_DN_Number_Final"].apply(lambda x: x.lower(str()))
@@ -1042,7 +1058,7 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
     gstr2a['PAN_INVDATE_2_WAY'] = gstr2a['PAN_Number'] + "/" + gstr2a['Inv_CN_DN_Date_Text']
 
 
-    itr = pd.read_excel(files_itr, sheet_name="Main_ITR_Format",dtype={"Invoice_Number":str, "Invoice_Date_Text":str,"Total_Tax":int})
+    itr = pd.read_excel(files_itr, sheet_name="Main_ITR_Format",dtype={"Invoice_Number":str, "Invoice_Date_Text":str,"Total_Tax":float})
 
     try:
         itr["Invoice_Numberl"] = itr["Invoice_Number"].apply(lambda x: x.lower(str()))
@@ -1183,13 +1199,13 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
                "Exact Match within Tolerance"]
 
-    compared["Remarks"] = np.select(conditions, results)
+    compared["Remarks_Effcorp"] = np.select(conditions, results)
 
     # The Above block of code gives us the pivot table with a comparison of the GSTR2A and the ITR with remarks column
 
     # now we will select the exact match within the Tolerance level
 
-    mask_1 = compared["Remarks"].values == "Exact Match within Tolerance"
+    mask_1 = compared["Remarks_Effcorp"].values == "Exact Match within Tolerance"
 
     match_3_way_list = compared[mask_1]["GST_INVNO_INVDATE_3_WAY"].values
 
@@ -1244,13 +1260,13 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
                "Exact Match within Tolerance"]
 
-    compared["Remarks"] = np.select(conditions, results)
+    compared["Remarks_Effcorp"] = np.select(conditions, results)
 
     # The Above block of code gives us the pivot table with a comparison of the GSTR2A and the ITR with remarks column
 
     # now we will select the exact match within the Tolerance level
 
-    mask_1 = compared["Remarks"].values == "Exact Match within Tolerance"
+    mask_1 = compared["Remarks_Effcorp"].values == "Exact Match within Tolerance"
 
     match_2_way_list1 = compared[mask_1]["GST_INVNO_2_WAY"].values
 
@@ -1306,13 +1322,13 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
                "Exact Match within Tolerance"]
 
-    compared["Remarks"] = np.select(conditions, results)
+    compared["Remarks_Effcorp"] = np.select(conditions, results)
 
     # The Above block of code gives us the pivot table with a comparison of the GSTR2A and the ITR with remarks column
 
     # now we will select the exact match within the Tolerance level
 
-    mask_1 = compared["Remarks"].values == "Exact Match within Tolerance"
+    mask_1 = compared["Remarks_Effcorp"].values == "Exact Match within Tolerance"
 
     match_2_way_list2 = compared[mask_1]["GST_INVDATE_2_WAY"].values
 
@@ -1374,13 +1390,13 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
                "Exact Match within Tolerance"]
 
-    compared["Remarks"] = np.select(conditions, results)
+    compared["Remarks_Effcorp"] = np.select(conditions, results)
 
     # The Above block of code gives us the pivot table with a comparison of the GSTR2A and the ITR with remarks column
 
     # now we will select the exact match within the Tolerance level
 
-    mask_1 = compared["Remarks"].values == "Exact Match within Tolerance"
+    mask_1 = compared["Remarks_Effcorp"].values == "Exact Match within Tolerance"
 
     match_3_way_list2 = compared[mask_1]["PAN_INVNO_INVDATE_3_WAY"].values
 
@@ -1438,13 +1454,13 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
                "Exact Match within Tolerance"]
 
-    compared["Remarks"] = np.select(conditions, results)
+    compared["Remarks_Effcorp"] = np.select(conditions, results)
 
     # The Above block of code gives us the pivot table with a comparison of the GSTR2A and the ITR with remarks column
 
     # now we will select the exact match within the Tolerance level
 
-    mask_1 = compared["Remarks"].values == "Exact Match within Tolerance"
+    mask_1 = compared["Remarks_Effcorp"].values == "Exact Match within Tolerance"
 
     match_2_way_list3 = compared[mask_1]["PAN_INVNO_2_WAY"].values
 
@@ -1504,13 +1520,13 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
                "Exact Match within Tolerance"]
 
-    compared["Remarks"] = np.select(conditions, results)
+    compared["Remarks_Effcorp"] = np.select(conditions, results)
 
     # The Above block of code gives us the pivot table with a comparison of the GSTR2A and the ITR with remarks column
 
     # now we will select the exact match within the Tolerance level
 
-    mask_1 = compared["Remarks"].values == "Exact Match within Tolerance"
+    mask_1 = compared["Remarks_Effcorp"].values == "Exact Match within Tolerance"
 
     match_2_way_list4 = compared[mask_1]["PAN_INVDATE_2_WAY"].values
 
@@ -1551,9 +1567,9 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
     unmatched_itr1=bal_itr_6cut[~maskpan]
 
-    unmatched_itr1["Remarks"]="PAN/GST not available in GSTR2A"
+    unmatched_itr1["Remarks_Effcorp"]="PAN/GST not available in GSTR2A"
 
-    ws["E25"].value = len(unmatched_itr1["Remarks"])
+    ws["E25"].value = len(unmatched_itr1["Remarks_Effcorp"])
     ws["F25"].value = sum(unmatched_itr1["Total_Tax"])
 
 
@@ -1572,11 +1588,11 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
     unmatched_itr2=bal_itr_6cut1[~mask1]
 
 
-    unmatched_itr2["Remarks"]="GST Number Check Sum Incorrect"
+    unmatched_itr2["Remarks_Effcorp"]="GST Number Check Sum Incorrect"
 
 
 
-    ws["E26"].value = len(unmatched_itr2["Remarks"])
+    ws["E26"].value = len(unmatched_itr2["Remarks_Effcorp"])
     ws["F26"].value = sum(unmatched_itr2["Total_Tax"])
 
 
@@ -1591,11 +1607,11 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
     bal_itr_6cut3=bal_itr_6cut2[mask2]
     unmatched_itr3=bal_itr_6cut2[~mask2]
 
-    unmatched_itr3["Remarks"]="Invoice No length exceed 16 digit"
+    unmatched_itr3["Remarks_Effcorp"]="Invoice No length exceed 16 digit"
 
     
 
-    ws["E27"].value = len(unmatched_itr3["Remarks"])
+    ws["E27"].value = len(unmatched_itr3["Remarks_Effcorp"])
     ws["F27"].value = sum(unmatched_itr3["Total_Tax"])
 
 
@@ -1677,7 +1693,7 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
     bal_gstr2a_7cut=bal_gstr2a_6cut[~mask1b]
 
-    bal_itr_6cut4["Remarks"]="These Cases are Not Matching"
+    bal_itr_6cut4["Remarks_Effcorp"]="These Cases are Not Matching"
 
 
     ws["C18"].value = len(prob_gstr2a_match["Inv_CN_DN_Number_Finall"])
@@ -1714,7 +1730,7 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
 
     ws["C28"].value = len(bal_gstr2a_7cut["GST_INVDATE_2_WAY"])
     ws["D28"].value = sum(bal_gstr2a_7cut["Total_Tax"])
-    ws["E28"].value = len(bal_itr_6cut4["Remarks"])
+    ws["E28"].value = len(bal_itr_6cut4["Remarks_Effcorp"])
     ws["F28"].value = sum(bal_itr_6cut4["Total_Tax"])
 
 
@@ -1728,7 +1744,457 @@ This function takes the 3 parameters. Two are Mandatory and 1 is optional
     wb.save(fullpath2)
     writer.save()
 
+    wb.close()
+    writer.close()
+
+
     print(f'Matching has been done and saved in below path \n {fullpath2}\n ')
+
+    return (writer)
+
+
+
+
+
+
+def flatten_dict(dic):
+    """
+    This is  avery useful function to flatten any dictionary which consists of a nested list of a nested dictionary
+
+    This function taken only 1 parameter ,
+
+    The parameter must be a dictionary
+
+    This function has a depndent function i.e expand_list
+
+    Both these functions always to be used simultaneously as they are compimentary to each other
+
+
+    """
+        
+    import pandas as pd
+    import json
+    import warnings
+    from openpyxl import load_workbook
+    import os
+
+    warnings.filterwarnings('ignore')
+
+    df2 = pd.DataFrame()
+
+    key_list = list(dic.keys())
+    flat_dict = dict()
+
+    for i in key_list:
+        dict_whole = {i: dic[i]}
+        dict_value = dic[i]
+
+        if isinstance(dict_value, dict):
+            flat_dict.update(dict_value)
+
+        elif isinstance(dict_value, list):
+
+            if len(dict_value) == 1:
+                a = dict_value[0]
+                b = flatten_dict(a)
+                flat_dict.update(b)
+            elif len(dict_value) == 0:
+                pass
+
+            else:
+                dicdf = expand_list(dict_value)
+                flat_dict.update(dicdf)
+
+        else:
+            flat_dict.update(dict_whole)
+
+    data_list = list(flat_dict.items())
+
+    df = pd.DataFrame(data_list)
+    df1 = df.T
+    df1.columns = df1.loc[0]
+    df1 = df1.drop(0)
+    df1 = df1.reset_index(drop=True)
+    return (flat_dict)
+
+
+def expand_list(list_dic):
+    """
+    This is  avery useful function to flatten any list which consists of a nested list or even a nested dictionary
+
+    This function taken only 1 parameter ,
+
+    The parameter must be of type list
+
+    This function has a depndent function i.e flatten_dict
+
+    Both these functions always to be used simultaneously as they are compimentary to each other
+
+    """
+    
+    import pandas as pd
+    import json
+    import warnings
+    from openpyxl import load_workbook
+    import os
+
+    warnings.filterwarnings('ignore')
+
+
+    df2 = pd.DataFrame()
+
+    if len(list_dic) == 1:
+        a = list_dic[0]
+        b = flatten_dict(a)
+        conv_dict = b
+    else:
+
+        for i in list_dic:
+            if isinstance(i, dict):
+
+                flat_dictl = flatten_dict(i)
+
+                try:
+                    df1 = pd.DataFrame(flat_dictl)
+                except:
+                    df = pd.DataFrame(list(flat_dictl.items()))
+                    df1 = df.T
+                    df1.columns = df1.loc[0]
+                    df1 = df1.drop(0)
+                    df1 = df1.reset_index(drop=True)
+
+                df2 = df2.append(df1)
+
+            elif isinstance(i, list):
+                a = expand_list(i)
+                df2 = a
+
+            else:
+                dict_whole = {i: list_dic[i]}
+                df = pd.DataFrame(list(dict_whole.items()))
+                df1 = df.T
+                df1.columns = df1.loc[0]
+                df1 = df1.drop(0)
+                df1 = df1.reset_index(drop=True)
+
+                df2 = df2.append(df1)
+
+        conv_dict = df2.to_dict(orient="list")
+
+    return (conv_dict)
+
+
+def gstr1_to_excel(json_path):
+    """
+    This is a very easy to use funcion to extract the json data of GSTR1 into an excel file.
+
+    This function takes only one argument i.e a completepath to the json file upto extension
+
+    Simply pass the complete path and run.
+
+    Invoice wise data will be populated in the Excel sheet
+
+    """
+
+    
+    import pandas as pd
+    import json
+    import warnings
+    from openpyxl import load_workbook
+    import os
+
+    warnings.filterwarnings('ignore')
+
+
+    print(f'The Json GSTR-1 file path selected is {json_path}')
+    print("We are analyzing the sheets available")
+
+    pth = os.path.dirname(str(json_path))
+    fullpath1 = pth + "/" + "GSTR-1 Table Wise.xlsx"
+    writer = pd.ExcelWriter(fullpath1, engine='xlsxwriter', options={'strings_to_formulas': True})
+
+    fullpath1a = pth + "/" + "Summary.xlsx"
+    writer1 = pd.ExcelWriter(fullpath1a, engine='xlsxwriter', options={'strings_to_formulas': True})
+
+    df1 = pd.DataFrame()
+    df1.to_excel(writer1, sheet_name="Summary_GSTR1", index=False)
+
+    writer1.save()
+
+    fullpath2 = fullpath1a.replace("/", "\\")  # this is a very useful command for defining the correct filepath
+
+    wb = load_workbook(fullpath2)
+    ws = wb["Summary_GSTR1"]
+
+    ws["A1"].value = "AUTOMATION SOLUTIONS BY EFFICIENT CORPORATES-[TM]"
+    ws["A4"].value = "Summary of the GSTR-1 File Compiled"
+
+    ws["A6"].value = "GSTIN of the Seller"
+    ws["A7"].value = "GSTR-1 filing period"
+    ws["A8"].value = "GSTR-1 filing Type"
+    ws["A9"].value = "GT"
+
+    ws["A10"].value = "CUR_GT"
+    ws["A11"].value = "FILING DATE"
+
+    ws["A15"].value = "SUMMARY OF THE DIFFERENT TABLES IN THE GSTR-1 FILE"
+
+    ws.merge_cells("A15:I15")
+
+    ws["A17"].value = "GSTR-1 Tables"
+    ws["B17"].value = "Count"
+    ws["C17"].value = "Invoice Amount"
+    ws["D17"].value = "Taxable Value"
+    ws["E17"].value = "IGST"
+    ws["F17"].value = "CGST"
+
+    ws["G17"].value = "SGST"
+    ws["H17"].value = "Cess"
+    ws["I17"].value = "Total Tax Amount"
+
+    ws["A18"].value = "BUSINESS-2- BUSINESS (B2B)"
+    ws["A19"].value = "BUSINESS-2- CONSUMER-SMALL (B2CS)"
+
+    ws["A20"].value = "BUSINESS-2- CONSUMER-LARGE (B2CL)"
+    ws["A21"].value = "EXPORT (EXP)"
+    ws["A22"].value = "CREDIT NOTE / DEBIT NOTE (CDNR)"
+
+    ws["A24"].value = "HSN SUMMARY"
+
+    with open(json_path) as json_file:
+        data = json.load(json_file)
+
+    dic_keys = data.keys
+
+    for i in dic_keys():
+
+        if i == "gstin":
+            print("We are getting the Meta Data for you...Please wait...!")
+            gst = data[i]
+            ws["B6"].value = gst
+
+        elif i == "fp":
+            fp = data[i]
+            ws["B7"].value = fp
+
+        elif i == "filing_typ":
+            fil = data[i]
+            if fil == "M":
+                ws["B8"].value = "Monthly"
+            elif fil == "Q":
+                ws["B8"].value = "Quarterly"
+            else:
+                ws["B8"].value = fil
+
+        elif i == "gt":
+            gt = data[i]
+            ws["B9"].value = gt
+
+        elif i == "cur_gt":
+            cur_gt = data[i]
+            ws["B10"].value = cur_gt
+
+        elif i == "b2b":
+
+            print("Fetching the B2B data, Please wait for some time...!!")
+            b2b_data = data[i]
+            dic_b2b = expand_list(b2b_data)
+            df_b2b = pd.DataFrame(dic_b2b)
+            df_b2b["GSTR-Table"] = "B2B"
+            df_b2b.to_excel(writer, sheet_name='B2B_DATA', index=False)
+
+        elif i == "b2cl":
+
+            print("Fetching the B2CL data, Please wait for some time...!!")
+            b2cl_data = data[i]
+            dic_b2cl = expand_list(b2cl_data)
+            df_b2cl = pd.DataFrame(dic_b2cl)
+            df_b2cl["GSTR-Table"] = "B2C-L"
+            df_b2cl.to_excel(writer, sheet_name='B2CL_DATA', index=False)
+
+        elif i == "cdnr":
+
+            print("Fetching the CDNR data, Please wait for some time...!!")
+            cdnr_data = data[i]
+            dic_cdnr = expand_list(cdnr_data)
+            df_cdnr = pd.DataFrame(dic_cdnr)
+            df_cdnr["GSTR-Table"] = "CDNR"
+            df_cdnr.to_excel(writer, sheet_name='CDNR_DATA', index=False)
+
+
+        elif i == "exp":
+
+            print("Fetching the Export data, Please wait for some time...!!")
+            exp_data = data[i]
+            dic_exp = expand_list(exp_data)
+            df_exp = pd.DataFrame(dic_exp)
+            df_exp["GSTR-Table"] = "EXPORT"
+            df_exp.to_excel(writer, sheet_name='EXPORT_DATA', index=False)
+
+        elif i == "b2cs":
+
+            print("Fetching the B2CS data, Please wait for some time...!!")
+            b2cs_data = data[i]
+            dic_b2cs = expand_list(b2cs_data)
+            df_b2cs = pd.DataFrame(dic_b2cs)
+            df_b2cs["GSTR-Table"] = "B2C-S"
+            df_b2cs.to_excel(writer, sheet_name='B2CS_DATA', index=False)
+
+        elif i == "hsn":
+
+            print("Getting the HSN Summary For you...!!")
+            hsn_data = data[i]
+            dic_hsn = flatten_dict(hsn_data)
+            df_hsn = pd.DataFrame(dic_hsn)
+            df_hsn.to_excel(writer, sheet_name='HSN_DATA', index=False)
+
+        elif i == "nil":
+            nil_data = data[i]
+            dic_nil = flatten_dict(nil_data)
+            df_nil = pd.DataFrame(dic_nil)
+            df_nil.to_excel(writer, sheet_name='NIL_NONGST_DATA', index=False)
+
+        elif i == "doc_issue":
+            print("Getting the Document Series Summary For you...!!")
+            doc_data = data[i]
+            dic_doc = flatten_dict(doc_data)
+            df_doc = pd.DataFrame(dic_doc)
+            df_doc.to_excel(writer, sheet_name='DOC_SERIES_DATA', index=False)
+
+        elif i == "fil_dt":
+            fildt = data["fil_dt"]
+            ws["B11"].value = fildt
+
+        else:
+            add_case = data[i]
+            if isinstance(add_case, list):
+                dic_add_case = expand_list(add_case)
+                df_add_case = pd.DataFrame(dic_add_case)
+                df_add_case["GSTR-Table"] = i
+                df_add_case.to_excel(writer, sheet_name=i, index=False)
+            elif isinstance(add_case, dict):
+                dic_add_case = flatten_dict(add_case)
+                df_add_case = pd.DataFrame(dic_add_case)
+                df_add_case["GSTR-Table"] = i
+                df_add_case.to_excel(writer, sheet_name=i, index=False)
+            else:
+                pass
+
+    wb.save(fullpath2)
+    writer.save()
+    #
+    # print("Consolidating All Major Tables in Single Sheet for you..!!")
+    # df_comb = pd.concat([df_b2b, df_b2cl, df_cdnr, df_exp, df_b2cs])
+    # df_comb.to_excel(writer, sheet_name="All_Combined_Case", index=False)
+
+    wb.save(fullpath2)
+    # writer.save()
+
+    try:
+        ws["B18"].value = len(df_b2b["ctin"])
+        ws["C18"].value = df_b2b["val"].sum()
+        ws["D18"].value = df_b2b["txval"].sum()
+        ws["E18"].value = df_b2b["iamt"].sum()
+        ws["F18"].value = df_b2b["camt"].sum()
+        ws["G18"].value = df_b2b["samt"].sum()
+        ws["H18"].value = df_b2b["csamt"].sum()
+        ws["I18"].value = df_b2b["iamt"].sum() + df_b2b["camt"].sum() + df_b2b["samt"].sum() + df_b2b["csamt"].sum()
+    except:
+        pass
+
+    
+    try:
+
+        ws["B19"].value = len(df_b2cs["rt"])
+        #     ws["C19"].value = sum(df_b2cs["val"])
+        ws["D19"].value = df_b2cs["txval"].sum()
+        ws["E19"].value = df_b2cs["iamt"].sum()
+        ws["F19"].value = df_b2cs["camt"].sum()
+        ws["G19"].value = df_b2cs["samt"].sum()
+        # ws["H19"].value = df_b2cs["csamt"].sum()
+        ws["I19"].value = df_b2cs["iamt"].sum() + df_b2cs["camt"].sum() + df_b2cs["samt"].sum()
+    except:
+        pass
+
+
+
+    try:
+        ws["B20"].value = len(df_b2cl["val"])
+        ws["C20"].value = df_b2cl["val"].sum()
+        ws["D20"].value = df_b2cl["txval"].sum()
+        ws["E20"].value = df_b2cl["iamt"].sum()
+        #     ws["F20"].value = df_b2cl["camt"].sum()
+        #     ws["G20"].value = df_b2cl["samt"].sum()
+        ws["H20"].value = df_b2cl["csamt"].sum()
+        ws["I20"].value = df_b2cl["iamt"].sum()
+
+    except:
+        pass
+
+
+    try:
+
+        ws["B21"].value = len(df_exp["flag"])
+        ws["C21"].value = df_exp["val"].sum()
+        ws["D21"].value = df_exp["txval"].sum()
+        ws["E21"].value = df_exp["iamt"].sum()
+        #     ws["F21"].value = df_exp["camt"].sum()
+        #     ws["G21"].value = df_exp["samt"].sum()
+        ws["H21"].value = df_exp["csamt"].sum()
+        ws["I21"].value = df_exp["iamt"].sum()
+    except:
+        pass
+
+
+    try:
+
+        ws["B22"].value = len(df_cdnr["flag"])
+        ws["C22"].value = df_cdnr["val"].sum()
+        ws["D22"].value = df_cdnr["txval"].sum()
+        ws["E22"].value = df_cdnr["iamt"].sum()
+        #     ws["F22"].value = df_cdnr["camt"].sum()
+        #     ws["G22"].value = df_cdnr["samt"].sum()
+        ws["H22"].value = df_cdnr["csamt"].sum()
+        ws["I22"].value = df_cdnr["iamt"].sum()
+
+    except:
+        pass
+
+    try:
+        ws["B24"].value = len(df_hsn["flag"])
+        #     ws["C24"].value = df_hsn["val"].sum()
+        ws["D24"].value = df_hsn["txval"].sum()
+        ws["E24"].value = df_hsn["iamt"].sum()
+        ws["F24"].value = df_hsn["camt"].sum()
+        ws["G24"].value = df_hsn["samt"].sum()
+        ws["H24"].value = df_hsn["csamt"].sum()
+        ws["I24"].value = df_hsn["iamt"].sum() + df_hsn["camt"].sum() + df_hsn["samt"].sum() + df_hsn["csamt"].sum()
+
+    except:
+        pass
+
+    writer.save()
+
+    print("All Data have been extracted Successfully! ")
+
+    wb.save(fullpath2)
+    writer.save()
+
+    wb.close()
+    writer.close()
+
+    
+
+    print("We have created two Excel files for you..!! 1) Summary.xlsx and 2) GSTR-1 Table Wise.xlsx")
+
+    print(f'The Excel Files are Extracted and kept in the below path \n {fullpath2}\n{fullpath1} ')
+
+    return(writer)
+
+
+
+
+
 
 
 
