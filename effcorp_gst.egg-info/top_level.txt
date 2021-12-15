@@ -1,2 +1,0 @@
-effcorp-gst
-gst
