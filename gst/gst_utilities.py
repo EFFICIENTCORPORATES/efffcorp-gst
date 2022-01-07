@@ -1884,7 +1884,8 @@ def expand_list(list_dic):
     return (conv_dict)
 
 
-def gstr1_to_excel(json_path):
+
+def gstr1_to_excel(filepath):
     """
     This is a very easy to use funcion to extract the json data of GSTR1 into an excel file.
 
@@ -1906,14 +1907,25 @@ def gstr1_to_excel(json_path):
     warnings.filterwarnings('ignore')
 
 
-    print(f'The Json GSTR-1 file path selected is {json_path}')
+    print(f'The Json GSTR-1 file path selected is {filepath}')
     print("We are analyzing the sheets available")
 
-    pth = os.path.dirname(str(json_path))
-    fullpath1 = pth + "/" + "GSTR-1 Table Wise.xlsx"
+
+    folder=os.path.dirname(filepath)
+    
+    fullpath1=folder+"\\"+"Converted_GSTR-1 Table Wise"+filepath.split("\\")[-1].split(".")[0]+".xlsx"
+
+    
+    pth = os.path.dirname(str(filepath))
+    
+    # fullpath1 = pth + "/" + "GSTR-1 Table Wise.xlsx"
+    
     writer = pd.ExcelWriter(fullpath1, engine='xlsxwriter', options={'strings_to_formulas': True})
 
-    fullpath1a = pth + "/" + "Summary.xlsx"
+    fullpath1a=folder+"\\"+"Converted_GSTR-1 Summary"+filepath.split("\\")[-1].split(".")[0]+".xlsx"
+
+
+    # fullpath1a = pth + "/" + "Summary.xlsx"
     writer1 = pd.ExcelWriter(fullpath1a, engine='xlsxwriter', options={'strings_to_formulas': True})
 
     df1 = pd.DataFrame()
@@ -1961,7 +1973,7 @@ def gstr1_to_excel(json_path):
 
     ws["A24"].value = "HSN SUMMARY"
 
-    with open(json_path) as json_file:
+    with open(filepath) as json_file:
         data = json.load(json_file)
 
     dic_keys = data.keys
@@ -2001,6 +2013,7 @@ def gstr1_to_excel(json_path):
             dic_b2b = expand_list(b2b_data)
             df_b2b = pd.DataFrame(dic_b2b)
             df_b2b["GSTR-Table"] = "B2B"
+            df_b2b["Json File Name"] = filepath
             df_b2b.to_excel(writer, sheet_name='B2B_DATA', index=False)
 
         elif i == "b2cl":
@@ -2010,6 +2023,7 @@ def gstr1_to_excel(json_path):
             dic_b2cl = expand_list(b2cl_data)
             df_b2cl = pd.DataFrame(dic_b2cl)
             df_b2cl["GSTR-Table"] = "B2C-L"
+            df_b2cl["Json File Name"] = filepath
             df_b2cl.to_excel(writer, sheet_name='B2CL_DATA', index=False)
 
         elif i == "cdnr":
@@ -2019,6 +2033,7 @@ def gstr1_to_excel(json_path):
             dic_cdnr = expand_list(cdnr_data)
             df_cdnr = pd.DataFrame(dic_cdnr)
             df_cdnr["GSTR-Table"] = "CDNR"
+            df_cdnr["Json File Name"] = filepath
             df_cdnr.to_excel(writer, sheet_name='CDNR_DATA', index=False)
 
 
@@ -2029,6 +2044,7 @@ def gstr1_to_excel(json_path):
             dic_exp = expand_list(exp_data)
             df_exp = pd.DataFrame(dic_exp)
             df_exp["GSTR-Table"] = "EXPORT"
+            df_exp["Json File Name"] = filepath
             df_exp.to_excel(writer, sheet_name='EXPORT_DATA', index=False)
 
         elif i == "b2cs":
@@ -2038,6 +2054,7 @@ def gstr1_to_excel(json_path):
             dic_b2cs = expand_list(b2cs_data)
             df_b2cs = pd.DataFrame(dic_b2cs)
             df_b2cs["GSTR-Table"] = "B2C-S"
+            df_b2cs["Json File Name"] = filepath
             df_b2cs.to_excel(writer, sheet_name='B2CS_DATA', index=False)
 
         elif i == "hsn":
@@ -2187,14 +2204,641 @@ def gstr1_to_excel(json_path):
 
     print("We have created two Excel files for you..!! 1) Summary.xlsx and 2) GSTR-1 Table Wise.xlsx")
 
-    print(f'The Excel Files are Extracted and kept in the below path \n {fullpath2}\n{fullpath1} ')
+    print(f'The Excel Files are Extracted and kept in the below path \n {fullpath2}\n{fullpath1}\n\n ')
 
     return(writer)
 
 
 
+def merge_gstr2b_excel(folder):
 
 
+    """
+
+    This function is for merging all the GSTR2B excel file as downloaded from the GST Portal.
+
+    This function takes only one parameter i.e the folder pth in which these excel files are stored.
+
+    Do not keep any other excel file. ALso, do no keep the GSTR2B summary file in this folder.
+
+
+    """
+
+    import pandas as pd
+    import glob
+    import os
+    from UliPlot.XLSX import auto_adjust_xlsx_column_width
+    
+
+    filenames = glob.glob(folder + "/*.xlsx")
+    
+    df_master=pd.DataFrame()
+
+  
+
+    df_b2b=pd.DataFrame()
+    
+    
+          
+    path=os.path.join(folder + "\All_Combined_GSTR2B.xlsx")
+
+    writer=pd.ExcelWriter(path,engine='xlsxwriter',engine_kwargs={'options': {'strings_to_numbers': True}})
+  
+
+    for file in filenames:
+        
+        
+        file_name=file.split("\\")[-1]
+        print(f"Working on B2B data...for file {file_name}")
+        
+        try:
+
+            df=pd.read_excel(file,sheet_name ="B2B")
+            df =df.rename({'Goods and Services Tax  - GSTR-2B':'GSTIN_of_Supplier',
+                           'Unnamed: 1':'Trade_Name_of_Supplier',
+                           'Unnamed: 2':'Final_Invoice_CNDN_No',
+                           'Unnamed: 3':'Final_Inv_CNDN_Type',
+                           'Unnamed: 4':'Final_Invoice_CNDN_Date',
+                           'Unnamed: 5':'Invoice_CNDN_Value',
+                           'Unnamed: 6':'Place_Of_Supply',
+                           'Unnamed: 7':'Supply_Attract_Reverse_Charge',
+                           'Unnamed: 8':'Tax_Rate',
+                           'Unnamed: 9':'Taxable_Value',
+                           'Unnamed: 10':'IGST_Amount',
+                           'Unnamed: 11':'CGST_Amount',
+                           'Unnamed: 12':'SGST_Amount',
+                           'Unnamed: 13':'Cess_Amount',
+                           'Unnamed: 14':'Supplier_Filing_Period',
+                           'Unnamed: 15':'Supplier_Filing_Date',
+                           'Unnamed: 16':'ITC_Available',
+                           'Unnamed: 17':'Reason',
+                           'Unnamed: 18':'Applicable_Percent_TaxRate',
+                           'Unnamed: 19':'Source_Type',
+                           'Unnamed: 20':'IRN',
+                           'Unnamed: 21':'IRN_Generate_Date'}, axis=1)
+            
+            df =df.drop([0,1,2,3,4])
+            df['GSTR2B_Table']="B2B"
+            df['File_Name']=file
+            df_b2b=df_b2b.append(df)
+        except:
+            pass
+        
+        
+        
+    
+    
+    df_b2ba=pd.DataFrame()
+    
+
+    for file in filenames:
+        
+        
+        file_name=file.split("\\")[-1]
+        print(f"Working on B2BA data...for file {file_name}")
+        
+        try:
+            
+
+            df=pd.read_excel(file,sheet_name ="B2BA")
+            df =df.rename({ 'Goods and Services Tax  - GSTR-2B':'Initial_Inv_CNDN_Num',
+                            'Unnamed: 1':'Initial_Inv_CNDN_Date',
+                            'Unnamed: 2':'GSTIN_of_Supplier',
+                            'Unnamed: 3':'Trade_Name_of_Supplier',
+                            'Unnamed: 4':'Final_Invoice_CNDN_No',
+                            'Unnamed: 5':'Final_Inv_CNDN_Type',
+                            'Unnamed: 6':'Final_Invoice_CNDN_Date',
+                            'Unnamed: 7':'Invoice_CNDN_Value',
+                            'Unnamed: 8':'Place_Of_Supply',
+                            'Unnamed: 9':'Supply_Attract_Reverse_Charge',
+                            'Unnamed: 10':'Tax_Rate',
+                            'Unnamed: 11':'Taxable_Value',
+                            'Unnamed: 12':'IGST_Amount',
+                            'Unnamed: 13':'CGST_Amount',
+                            'Unnamed: 14':'SGST_Amount',
+                            'Unnamed: 15':'Cess_Amount',
+                            'Unnamed: 16':'Supplier_Filing_Period',
+                            'Unnamed: 17':'Supplier_Filing_Date',
+                            'Unnamed: 18':'ITC_Available',
+                            'Unnamed: 19':'Reason',
+                            'Unnamed: 20':'Applicable_Percent_TaxRate'}, axis=1)
+            df =df.drop([0,1,2,3,4,5])
+            df['GSTR2B_Table']="B2BA"
+            df['File_name']=file
+            df_b2ba=df_b2ba.append(df)
+        except:
+            pass
+        
+    
+    
+    
+    df_b2bcd=pd.DataFrame()
+    
+
+    for file in filenames:
+        
+        
+        file_name=file.split("\\")[-1]
+        print(f"Working on CDNR data...for file {file_name}")
+        
+        try:
+            
+
+            df=pd.read_excel(file,sheet_name ="B2B-CDNR")
+            df =df.rename({ 'Goods and Services Tax  - GSTR-2B':'GSTIN_of_Supplier',
+                            'Unnamed: 1':'Trade_Name_of_Supplier',
+                            'Unnamed: 2':'Final_Invoice_CNDN_No',
+                            'Unnamed: 3':'Final_Inv_CNDN_Type',
+                            'Unnamed: 4':'Note_Supply_Type',
+                            'Unnamed: 5':'Final_Invoice_CNDN_Date',
+                            'Unnamed: 6':'Invoice_CNDN_Value',
+                            'Unnamed: 7':'Place_Of_Supply',
+                            'Unnamed: 8':'Supply_Attract_Reverse_Charge',
+                            'Unnamed: 9':'Tax_Rate',
+                            'Unnamed: 10':'Taxable_Value',
+                            'Unnamed: 11':'IGST_Amount',
+                            'Unnamed: 12':'CGST_Amount',
+                            'Unnamed: 13':'SGST_Amount',
+                            'Unnamed: 14':'Cess_Amount',
+                            'Unnamed: 15':'Supplier_Filing_Period',
+                            'Unnamed: 16':'Supplier_Filing_Date',
+                            'Unnamed: 17':'ITC_Available',
+                            'Unnamed: 18':'Reason',
+                            'Unnamed: 19':'Applicable_Percent_TaxRate',
+                            'Unnamed: 20':'Source_Type',
+                            'Unnamed: 21':'IRN',
+                            'Unnamed: 22':'IRN_Generate_Date'}, axis=1)
+            df =df.drop([0,1,2,3,4])
+            df['GSTR2B_Table']="B2B-CDNR"
+            df['File_name']=file
+            df_b2bcd=df_b2bcd.append(df)
+        except:
+            pass
+        
+    
+     
+    
+    df_b2bcdnra=pd.DataFrame()
+    
+
+    for file in filenames:
+        
+        
+        
+        file_name=file.split("\\")[-1]
+        print(f"Working on CDNRA data...for file {file_name}")
+        
+        try:
+            
+
+            df=pd.read_excel(file,sheet_name ="B2B-CDNRA")
+            df =df.rename({ 'Goods and Services Tax  - GSTR-2B':'Initial_Inv_CNDN_Type',
+                            'Unnamed: 1':'Initial_Inv_CNDN_No',
+                            'Unnamed: 2':'Initial_Inv_CNDN_Date',
+                            'Unnamed: 3':'GSTIN_of_Supplier',
+                            'Unnamed: 4':'Trade_Name_of_Supplier',
+                            'Unnamed: 5':'Final_Invoice_CNDN_No',
+                            'Unnamed: 6':'Final_Inv_CNDN_Type',
+                            'Unnamed: 7':'Note_Supply_Type',
+                            'Unnamed: 8':'Final_Invoice_CNDN_Date',
+                            'Unnamed: 9':'Invoice_CNDN_Value',
+                            'Unnamed: 10':'Place_Of_Supply',
+                            'Unnamed: 11':'Supply_Attract_Reverse_Charge',
+                            'Unnamed: 12':'Tax_Rate',
+                            'Unnamed: 13':'Taxable_Value',
+                            'Unnamed: 14':'IGST_Amount',
+                            'Unnamed: 15':'CGST_Amount',
+                            'Unnamed: 16':'SGST_Amount',
+                            'Unnamed: 17':'Cess_Amount',
+                            'Unnamed: 18':'Supplier_Filing_Period',
+                            'Unnamed: 19':'Supplier_Filing_Date',
+                            'Unnamed: 20':'ITC_Available',
+                            'Unnamed: 21':'Reason',
+                            'Unnamed: 22':'Applicable_Percent_TaxRate'}, axis=1)
+            df =df.drop([0,1,2,3,4,5])
+            df['GSTR2B_Table']="B2B-CDNRA"
+            df['File_name']=file
+            df_b2bcdnra=df_b2bcdnra.append(df)
+        
+        except:
+            pass
+        
+
+    
+    df_isd=pd.DataFrame()
+    
+
+    for file in filenames:
+        
+        
+        
+        file_name=file.split("\\")[-1]
+        print(f"Working on ISD data...for file {file_name}")
+        
+        try:
+            
+
+            df=pd.read_excel(file,sheet_name ="ISD")
+            df =df.rename({ 'Goods and Services Tax  - GSTR-2B':'GSTIN_of_Supplier',
+                            'Unnamed: 1':'Trade_Name_of_Supplier',
+                            'Unnamed: 2':'Final_Inv_CNDN_Type',
+                            'Unnamed: 3':'Final_Invoice_CNDN_No',
+                            'Unnamed: 4':'Final_Invoice_CNDN_Date',
+                            'Unnamed: 5':'Initial_Inv_CNDN_No',
+                            'Unnamed: 6':'Initial_Inv_CNDN_Date',
+                            'Unnamed: 7':'IGST_Amount',
+                            'Unnamed: 8':'CGST_Amount',
+                            'Unnamed: 9':'SGST_Amount',
+                            'Unnamed: 10':'Cess_Amount',
+                            'Unnamed: 11':'Supplier_Filing_Period',
+                            'Unnamed: 12':'Supplier_Filing_Date',
+                            'Unnamed: 13':'ITC_Available'}, axis=1)
+            df =df.drop([0,1,2,3,4])
+            df['GSTR2B_Table']="ISD"
+            df['File_name']=file
+            df_isd=df_isd.append(df)
+        except:
+            pass
+        
+    
+    
+
+        
+
+    df_impg=pd.DataFrame()
+    
+
+    for file in filenames:
+        
+        
+        file_name=file.split("\\")[-1]
+        print(f"Working on IMPORT data...for file {file_name}")
+        
+        try:
+            
+
+            df=pd.read_excel(file,sheet_name ="IMPG")
+            df =df.rename({ 'Goods and Services Tax  - GSTR-2B':'IceGate_Ref_Date',
+                            'Unnamed: 1':'Port_Code',
+                            'Unnamed: 2':'Bill_Of_Entry_No',
+                            'Unnamed: 3':'Record_Date',
+                            'Unnamed: 4':'Taxable_Value',
+                            'Unnamed: 5':'IGST_Amount',
+                            'Unnamed: 6':'Cess_Amount',
+                            'Unnamed: 7':'Amended_Y_N'}, axis=1)
+            df =df.drop([0,1,2,3,4])
+            df['File_name']=file
+            df['GSTR2B_Table']="IMPG"
+            df_impg=df_impg.append(df)
+        except:
+            pass
+        
+    
+    
+    
+    print("Combining all the files...")
+    
+
+    
+    
+        
+    df_master=pd.concat([df_b2b,df_b2ba,df_b2bcd,df_b2bcdnra,df_isd,df_impg])
+    
+#     df_master=df_master[['GSTIN_of_Supplier','Trade_Name_of_Supplier','Final_Invoice_CNDN_No','Final_Inv_CNDN_Type',
+#                          'Final_Invoice_CNDN_Date','Revised Invoice number','Revised Invoice Date','Original Note Number',
+#                          'Original Note Date','Note type','Original Note type','Note Supply type','Note Value (₹)',
+#                          'Revised Note number','Revised Note date','Invoice Value(₹)','Place of supply',
+#                          'Supply Attract Reverse Charge','Rate(%)','Taxable Value (₹)','Integrated Tax(₹)',
+#                          'Central Tax(₹)','State/UT Tax(₹)','Cess(₹)','GSTR-1/IFF/GSTR-5 Period',
+#                          'GSTR-1/IFF/GSTR-5 Filing Date','ITC Availability','Reason','Applicable % of Tax Rate',
+#                          'Source','IRN','IRN Date','GSTIN of ISD','ISD Document type','ISD Document number',
+#                          'ISD Document date','Original invoice date','ISD GSTR-6 Period','ISD GSTR-6 Filing Date',
+#                          'Eligibility of ITC','Icegate Reference Date','Port Code','Number','Date',
+#                          'Icegate Taxable Value','Amended (Yes)','Sheet name','File_name']]
+    
+#     df_master=df_master[["GSTIN_of_Supplier","Trade_Name_of_Supplier","GSTR2B_Table","Supply_Attract_Reverse_Charge",
+#                          "Final_Invoice_CNDN_No","Final_Inv_CNDN_Type","Final_Invoice_CNDN_Date","Invoice_CNDN_Value",
+#                          "Place_Of_Supply","Tax_Rate",
+#                          "Taxable_Value","IGST_Amount","CGST_Amount","SGST_Amount","Cess_Amount",
+#                          "Supplier_Filing_Period","Supplier_Filing_Date","ITC_Available","Reason",
+#                          "Applicable_Percent_TaxRate"]]
+    
+
+        
+    
+    df_master.to_excel(writer,sheet_name="All_Combined",index=False)
+    auto_adjust_xlsx_column_width(df_master, writer, sheet_name="All_Combined", margin=10)
+    
+    
+    
+    df_b2ba.to_excel(writer,sheet_name="B2BA",index=False)
+    auto_adjust_xlsx_column_width(df_b2ba, writer, sheet_name="B2BA", margin=10)
+    
+    
+    
+    df_b2b.to_excel(writer,sheet_name="B2B",index=False)
+    auto_adjust_xlsx_column_width(df_b2b, writer, sheet_name="B2B", margin=10)
+ 
+    df_impg.to_excel(writer,sheet_name="IMPG",index=False)
+    auto_adjust_xlsx_column_width(df_b2bcd, writer, sheet_name="IMPG", margin=10)    
+    
+        
+    df_isd.to_excel(writer,sheet_name="ISD",index=False)
+    auto_adjust_xlsx_column_width(df_b2bcd, writer, sheet_name="ISD", margin=10)
+    
+
+
+    df_b2bcdnra.to_excel(writer,sheet_name="B2B-CDNRA",index=False)
+    auto_adjust_xlsx_column_width(df_b2bcd, writer, sheet_name="B2B-CDNRA", margin=10)
+    
+    df_b2bcd.to_excel(writer,sheet_name="B2B-CDNR",index=False)
+    auto_adjust_xlsx_column_width(df_b2bcd, writer, sheet_name="B2B-CDNR", margin=10)
+    
+    writer.save()
+    
+    print(f"All excel files of GSTR2B has been Combined. Combined files stored in {path}")
+
+
+
+
+def rename_2b_columns(dataframe):
+
+    """
+
+    This is a support function for the gstr2B to Excel conversion
+
+
+    """
+    
+    dataframe.rename(columns={"dt":"Final_Invoice_CNDN_Date",
+                "val":"Invoice_CNDN_Value",
+                "rev":"Supply_Attract_Reverse_Charge",
+                "itcavl":"ITC_Available",
+                "diffprcnt":"Applicable_Percent_TaxRate",
+                "pos":"Place_Of_Supply",
+                "typ":"Final_Inv_CNDN_Type",
+                "inum":"Final_Invoice_CNDN_No",
+                "rsn":"Reason",
+                "sgst":"SGST_Amount",
+                "rt":"Tax_Rate",
+                "num":"Check_num",
+                "txval":"Taxable_Value",
+                "cgst":"CGST_Amount",
+                "cess":"Cess_Amount",
+                "trdnm":"Trade_Name_of_Supplier",
+                "supfildt":"Supplier_Filing_Date",
+                "supprd":"Supplier_Filing_Period",
+                "ctin":"GSTIN_of_Supplier",
+                "igst":"IGST_Amount",
+                "irn":"IRN",
+                "irngendate":"IRN_Generate_Date",
+                "srctyp":"Source_Type",
+                "GSTR2B-Table":"GSTR2B-Table",
+                "rtnprd":"GSTR2B_Period",
+                "gstin":"Recipient_GSTIN",
+                "Json File Name":"JSON_Source_File",
+                "File_Name":"Source_Excel_File",
+                "oinum":"Initial_Inv_CNDN_No",
+                "oidt":"Initial_Inv_CNDN_Date",
+                "ntnum":"Final_Invoice_CNDN_No",
+                "suptyp":"Note_Supply_Type",
+                "ontdt":"Initial_Inv_CNDN_Date",
+                "onttyp":"Initial_Inv_CNDN_Type",
+                "ontnum":"Initial_Inv_CNDN_No",
+                "docnum":"Final_Invoice_CNDN_No",
+                "itcelg":"ITC_Available",
+                "doctyp":"Final_Inv_CNDN_Type",
+                "docdt":"Final_Invoice_CNDN_Date",
+                "oinvnum":"Initial_Inv_CNDN_No",
+                "oinvdt":"Initial_Inv_CNDN_Date",
+                "boedt":"Bill_Of_Entry_Date",
+                "isamd":"Amended_Y_N",
+                "recdt":"Record_Date",
+                "refdt":"IceGate_Ref_Date",
+                "boenum":"Bill_Of_Entry_No",
+                "portcode":"Port_Code"},inplace=True)
+    
+
+
+def gstr2b_to_excel(filepath):
+    """
+    This is a very easy to use funcion to extract the json data of GSTR2b into an excel file.
+    This function takes only one argument i.e a completepath to the json file upto extension
+    Simply pass the complete path and run.
+    Table wise data will be populated in the Excel sheet
+    """
+
+    import pandas as pd
+    import json
+    import warnings
+    from openpyxl import load_workbook
+    import os
+
+    warnings.filterwarnings('ignore')
+
+    original_name=filepath.split("\\")[-1]
+    folder = os.path.dirname(filepath)
+    newfile = folder + "\\"+ "Converted_Excel_"  + filepath.split("\\")[-1].split(".")[0] + ".xlsx"
+
+    print(f"the file {original_name} has been selected... Working on it..!")
+    
+    
+    writer = pd.ExcelWriter(newfile, engine='xlsxwriter', options={'strings_to_formulas': True})
+
+#     writer=pd.ExcelWriter(newfile,engine='openpyxl')
+
+
+    df_impg=pd.DataFrame()
+    df_isd=pd.DataFrame()
+    df_cdnr=pd.DataFrame()
+    df_cdnra=pd.DataFrame()
+    df_b2b=pd.DataFrame()
+    df_b2ba=pd.DataFrame()
+
+    with open(filepath) as json_file:
+        data = json.load(json_file)
+
+        main_data=data["data"]['docdata']
+
+        return_period=data["data"]["rtnprd"]
+        rec_gstin=data["data"]["gstin"]
+
+        # print(abc)
+
+
+
+        for i in main_data.keys():
+#             print(i)
+
+            if i =="b2b":
+
+                print(f"Fetching the {i} data, Please wait for some time...!!")
+                b2b_data = main_data[i]
+                dic_b2b = expand_list(b2b_data)
+
+                try:
+
+                    df_b2b = pd.DataFrame(dic_b2b)
+                except ValueError:
+                    df_b2b = pd.DataFrame(dic_b2b,index=[0])
+
+
+                df_b2b["GSTR2B_Table"] = i
+                df_b2b["rtnprd"]=return_period
+                df_b2b["gstin"]=rec_gstin
+                df_b2b["Json_File_Name"]=filepath
+                
+                rename_2b_columns(df_b2b)
+                
+
+                
+                df_b2b.to_excel(writer, sheet_name=str(i+'_data'), index=False)
+                print(f"{i} Data converted to Excel....!!")
+
+#                 writer.save()
+
+            elif i=="b2ba":
+
+                print(f"Fetching the {i} data, Please wait for some time...!!")
+                b2ba_data = main_data[i]
+                dic_b2ba = expand_list(b2ba_data)
+
+                try:
+                    df_b2ba = pd.DataFrame(dic_b2ba)
+                except ValueError:
+                    df_b2ba = pd.DataFrame(dic_b2ba, index=[0])
+
+
+                df_b2ba["GSTR2B_Table"] = i
+                df_b2ba["rtnprd"]=return_period
+                df_b2ba["gstin"]=rec_gstin
+                df_b2ba["Json File Name"]=filepath
+                
+                
+                rename_2b_columns(df_b2ba)
+                
+                
+                df_b2ba.to_excel(writer, sheet_name=str(i+'_data'), index=False)
+                print(f"{i} Data converted to Excel....!!")
+
+#                 writer.save()
+
+
+            elif i=="cdnr":
+                print(f"Fetching the {i} data, Please wait for some time...!!")
+                cdnr_data = main_data[i]
+                dic_cdnr = expand_list(cdnr_data)
+
+                try:
+                    df_cdnr = pd.DataFrame(dic_cdnr)
+                except ValueError:
+                    df_cdnr = pd.DataFrame(dic_cdnr, index=[0])
+
+                df_cdnr["GSTR2B_Table"] = i
+                df_cdnr["rtnprd"] = return_period
+                df_cdnr["gstin"] = rec_gstin
+                df_cdnr["Json File Name"] = filepath
+                
+                
+                rename_2b_columns(df_cdnr)
+                
+                
+                df_cdnr.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+                print(f"{i} Data converted to Excel....!!")
+
+#                 writer.save()
+
+
+            elif i=="cdnra":
+                print(f"Fetching the {i} data, Please wait for some time...!!")
+                cdnra_data = main_data[i]
+                dic_cdnra = expand_list(cdnra_data)
+
+                try:
+                    df_cdnra = pd.DataFrame(dic_cdnra)
+                except ValueError:
+                    df_cdnra = pd.DataFrame(dic_cdnra, index=[0])
+
+
+                df_cdnra["GSTR2B_Table"] = i
+                df_cdnra["rtnprd"] = return_period
+                df_cdnra["gstin"] = rec_gstin
+                df_cdnra["Json File Name"] = filepath
+                
+                rename_2b_columns(df_cdnra)
+                
+                df_cdnra.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+                print(f"{i} Data converted to Excel....!!")
+
+#                 writer.save()
+
+
+            elif i=="isd":
+
+                print(f"Fetching the {i} data, Please wait for some time...!!")
+                isd_data = main_data[i]
+                dic_isd = expand_list(isd_data)
+
+
+                try:
+                    df_isd = pd.DataFrame(dic_isd)
+                except ValueError:
+                    df_isd = pd.DataFrame(dic_isd, index=[0])
+
+
+                df_isd["GSTR2B_Table"] = i
+                df_isd["rtnprd"] = return_period
+                df_isd["gstin"] = rec_gstin
+                df_isd["Json File Name"] = filepath
+                
+                rename_2b_columns(df_isd)
+                
+                df_isd.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+                print(f"{i} Data converted to Excel....!!")
+
+#                 writer.save()
+
+            elif i=="impg":
+                print(f"Fetching the {i} data, Please wait for some time...!!")
+                impg_data = main_data[i]
+                dic_impg = expand_list(impg_data)
+
+                try:
+                    df_impg = pd.DataFrame(dic_impg)
+                except ValueError:
+                    df_impg = pd.DataFrame(dic_impg, index=[0])
+
+                df_impg["GSTR2B_Table"] = i
+                df_impg["rtnprd"] = return_period
+                df_impg["gstin"] = rec_gstin
+                df_impg["Json File Name"] = filepath
+                
+                rename_2b_columns(df_impg)
+                
+                df_impg.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+                print(f"{i} Data converted to Excel....!!")
+
+#                 writer.save()
+
+            else:
+                pass
+
+        print(f"All Sheets Have been created separateky in same Excel File named {newfile}")
+
+
+    combined_2b=pd.concat([df_b2b,df_b2ba,df_cdnr,df_cdnra,df_isd,df_impg])
+
+    print("Combining all sheets into one single Excel Sheet , Named 'effcorp_all_combined'")
+
+
+    combined_2b.to_excel(writer,sheet_name="effcorp_all_combined",index=False)
+
+    print(f"Please Wait...Saving the single final file as {newfile}")
+
+    writer.save()
+    writer.close()
+
+    return (writer)
 
 
 
