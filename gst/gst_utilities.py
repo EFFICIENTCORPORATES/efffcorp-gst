@@ -284,7 +284,7 @@ def extract_pan(gst_no):
 
 
 
-def gstr2a_merge(filepath):
+def gstr2a_merge(folder):
     """
     This is a super useful Function for merging all the GSTR2A files kept in a folder.
 
@@ -324,9 +324,9 @@ def gstr2a_merge(filepath):
     import os
 
 
-    pth = os.path.dirname(filepath)
+#     pth = os.path.dirname(filepath)
 
-    filenames = glob.glob(pth + "/*.xlsx")
+    filenames = glob.glob(folder + "/*.xlsx")
 
     warnings.filterwarnings('ignore')
 
@@ -350,268 +350,271 @@ def gstr2a_merge(filepath):
 
     # A. iterate through each file to append it one below the other
 
-    # A.1 : This will iterate through the B2B file
 
 
     print(f"The files that will be combined are \n {filenames}")
 
 
-    print("We are working on B2B sheet of all the monthly GSTR2A..Please wait...")
-
-
-    df2 = pd.DataFrame()
+    df_all_b2b = pd.DataFrame()
+    
+    df_all_b2ba = pd.DataFrame()
+    
+    df_all_cdnr = pd.DataFrame()
+    
+    df_all_cdnra = pd.DataFrame()
 
     for files in filenames:
-        df = pd.read_excel(files, sheet_name=1)
+        
+        file_name=files.split("\\")[-1]
+        
+        df_b2b = pd.read_excel(files, sheet_name=1)
 
-        df1 = df.drop([0, 1, 2, 3, 4], axis=0)
+        df_b2b = df_b2b.drop([0, 1, 2, 3, 4], axis=0)
 
-        df1 = df1.dropna(how='all')
+        df_b2b = df_b2b.dropna(how='all')
 
-        df1['File_name'] = files
+        df_b2b['File_name'] = files
 
-        df2 = df2.append(df1)
+        df_all_b2b = df_all_b2b.append(df_b2b)
+        
+        print(f"Working on B2B sheet of {file_name}")
+        
+        
+        
+        df_b2ba = pd.read_excel(files, sheet_name=2)
+
+        df_b2ba = df_b2ba.drop([0, 1, 2, 3, 4, 5], axis=0)
+
+        df_b2ba = df_b2ba.dropna(how='all')
+
+        df_b2ba['File_name'] = files
+
+        df_all_b2ba = df_all_b2ba.append(df_b2ba)
+        
+        print(f"Working on B2BA sheet of {file_name}")
+        
+        
+        
+        df_cdnr = pd.read_excel(files, sheet_name=3)
+
+        df_cdnr = df_cdnr.drop([0, 1, 2, 3, 4], axis=0)
+
+        df_cdnr = df_cdnr.dropna(how='all')
+
+        df_cdnr['File_name'] = files
+
+        df_all_cdnr = df_all_cdnr.append(df_cdnr)
+        
+        print(f"Working on CDNR sheet of {file_name}")
+        
+        
+        
+        df_cdnra = pd.read_excel(files, sheet_name=4)
+
+        df_cdnra = df_cdnra.drop([0, 1, 2, 3, 4, 5], axis=0)
+
+        df_cdnra = df_cdnra.dropna(how='all')
+
+        df_cdnra['File_name'] = files
+
+        df_all_cdnra = df_all_cdnra.append(df_cdnra)
+        
+        print(f"Working on CDNRA sheet of {file_name}")
+        
 
     # this is used for deleting all the rows which are totally blank
 
-    df3 = df2
+    df3 = df_all_b2b
 
     # this is used for renaming the names of the columns
 
     df3.rename(columns={'Goods and Services Tax  - GSTR 2A': 'GSTIN_of_Supplier'}, inplace=True)
-    df3.rename(columns={'Unnamed: 1': 'Legal_Name_Of Supplier'}, inplace=True)
-    df3.rename(columns={'Unnamed: 2': 'Inv_CN_DN_Number_Original'}, inplace=True)
-    df3.rename(columns={'Unnamed: 3': 'Inv_CN_DN_Type_Original'}, inplace=True)
-    df3.rename(columns={'Unnamed: 4': 'Inv_CN_DN_Date_Original'}, inplace=True)
-    df3.rename(columns={'Unnamed: 5': 'Inv_CN_DN_Value_Original'}, inplace=True)
+    df3.rename(columns={'Unnamed: 1': 'Trade_Name_of_Supplier'}, inplace=True)
+    df3.rename(columns={'Unnamed: 2': 'Final_Invoice_CNDN_No'}, inplace=True)
+    df3.rename(columns={'Unnamed: 3': 'Final_Inv_CNDN_Type'}, inplace=True)
+    df3.rename(columns={'Unnamed: 4': 'Final_Invoice_CNDN_Date'}, inplace=True)
+    df3.rename(columns={'Unnamed: 5': 'Invoice_CNDN_Value'}, inplace=True)
     df3.rename(columns={'Unnamed: 6': 'Place_Of_Supply'}, inplace=True)
     df3.rename(columns={'Unnamed: 7': 'Supply_Attract_Reverse_Charge'}, inplace=True)
-    df3.rename(columns={'Unnamed: 8': 'GST_Rate'}, inplace=True)
-    df3.rename(columns={'Unnamed: 9': 'Taxable_Value_Rs'}, inplace=True)
-    df3.rename(columns={'Unnamed: 10': 'IGST_Rs'}, inplace=True)
-    df3.rename(columns={'Unnamed: 11': 'CGST_Rs'}, inplace=True)
-    df3.rename(columns={'Unnamed: 12': 'SGST_Rs'}, inplace=True)
-    df3.rename(columns={'Unnamed: 13': 'Cess'}, inplace=True)
+    df3.rename(columns={'Unnamed: 8': 'Tax_Rate'}, inplace=True)
+    df3.rename(columns={'Unnamed: 9': 'Taxable_Value'}, inplace=True)
+    df3.rename(columns={'Unnamed: 10': 'IGST_Amount'}, inplace=True)
+    df3.rename(columns={'Unnamed: 11': 'CGST_Amount'}, inplace=True)
+    df3.rename(columns={'Unnamed: 12': 'SGST_Amount'}, inplace=True)
+    df3.rename(columns={'Unnamed: 13': 'Cess_Amount'}, inplace=True)
     df3.rename(columns={'Unnamed: 14': 'GSTR_1_5_Filing_Status'}, inplace=True)
-    df3.rename(columns={'Unnamed: 15': 'GSTR_1_5_Filing_Date'}, inplace=True)
-    df3.rename(columns={'Unnamed: 16': 'GSTR_1_5_Filing_Period'}, inplace=True)
+    df3.rename(columns={'Unnamed: 15': 'Supplier_Filing_Date'}, inplace=True)
+    df3.rename(columns={'Unnamed: 16': 'Supplier_Filing_Period'}, inplace=True)
     df3.rename(columns={'Unnamed: 17': 'GSTR_3B_Filing_Status'}, inplace=True)
     df3.rename(columns={'Unnamed: 18': 'Amendment_made_if_any'}, inplace=True)
     df3.rename(columns={'Unnamed: 19': 'Tax_Period_in_which_Amended'}, inplace=True)
     df3.rename(columns={'Unnamed: 20': 'Effective_date_of_cancellation'}, inplace=True)
-    df3.rename(columns={'Unnamed: 21': 'Source'}, inplace=True)
+    df3.rename(columns={'Unnamed: 21': 'Source_Type'}, inplace=True)
     df3.rename(columns={'Unnamed: 22': 'IRN'}, inplace=True)
-    df3.rename(columns={'Unnamed: 23': 'IRN_Date'}, inplace=True)
+    df3.rename(columns={'Unnamed: 23': 'IRN_Generate_Date'}, inplace=True)
 
     # here we will remove the rows, in which the invoice number has  a total
-    filt = df3['Inv_CN_DN_Number_Original'].str.contains('Total', na=False)
+    filt = df3['Final_Invoice_CNDN_No'].str.contains('Total', na=False)
     df3 = df3[~filt]
 
-    df3['Inv_CN_DN_Date_Text'] = df3['Inv_CN_DN_Date_Original'].str.replace("-", ".")
-    df3['Total_Tax'] = df3['IGST_Rs'] + df3['CGST_Rs'] + df3['SGST_Rs']
-    df3['Unique_ID'] = df3['GSTIN_of_Supplier'] + "/" + df3['Inv_CN_DN_Number_Original'] + "/" + df3[
+    df3['Inv_CN_DN_Date_Text'] = df3['Final_Invoice_CNDN_Date'].str.replace("-", ".")
+    df3['Total_Tax'] = df3['IGST_Amount'] + df3['CGST_Amount'] + df3['SGST_Amount']
+    df3['Unique_ID'] = df3['GSTIN_of_Supplier'] + "/" + df3['Final_Invoice_CNDN_No'] + "/" + df3[
         'Inv_CN_DN_Date_Text']
 
-    df3['Sheet_Name'] = ("B2B")
+    df3['GSTR2A_Table'] = ("B2B")
 
     df3['PAN_Number'] = df3["GSTIN_of_Supplier"].apply(lambda x: x[2:12:1])
 
     df3 = df3.replace(np.nan, "", regex=True)
 
 
-    # A.2 : This will iterate through the B2BA file
-
-    print("We are working on B2BA sheet of all the monthly GSTR2A..Please wait")
-
-    df2 = pd.DataFrame()
-
-    for files in filenames:
-        df = pd.read_excel(files, sheet_name=2)
-
-        df1 = df.drop([0, 1, 2, 3, 4, 5], axis=0)
-
-        df1 = df1.dropna(how='all')
-
-        df1['File_name'] = files
-
-        df2 = df2.append(df1)
-
     # this is used for deleting all the rows which are totally blank
-    df4 = df2.dropna(how='all')
+    df4 = df_all_b2ba.dropna(how='all')
 
     # this is used for renaming the names of the columns
 
     df4.rename(
-        columns={'                                      Goods and Services Tax - GSTR-2A': 'Inv_CN_DN_Number_Original'},
+        columns={'                                      Goods and Services Tax - GSTR-2A': 'Initial_Inv_CNDN_No'},
         inplace=True)
-    df4.rename(columns={'Unnamed: 1': 'Inv_CN_DN_Date_Original'}, inplace=True)
+    df4.rename(columns={'Unnamed: 1': 'Initial_Inv_CNDN_Date'}, inplace=True)
     df4.rename(columns={'Unnamed: 2': 'GSTIN_of_Supplier'}, inplace=True)
-    df4.rename(columns={'Unnamed: 3': 'Legal_Name_Of Supplier'}, inplace=True)
-    df4.rename(columns={'Unnamed: 4': 'Inv_CN_DN_Type_Revised'}, inplace=True)
-    df4.rename(columns={'Unnamed: 5': 'Inv_CN_DN_Number_Revised'}, inplace=True)
-    df4.rename(columns={'Unnamed: 6': 'Inv_CN_DN_Date_Revised'}, inplace=True)
-    df4.rename(columns={'Unnamed: 7': 'Inv_CN_DN_Value_Revised'}, inplace=True)
+    df4.rename(columns={'Unnamed: 3': 'Trade_Name_of_Supplier'}, inplace=True)
+    df4.rename(columns={'Unnamed: 4': 'Final_Inv_CNDN_Type'}, inplace=True)
+    df4.rename(columns={'Unnamed: 5': 'Final_Invoice_CNDN_No'}, inplace=True)
+    df4.rename(columns={'Unnamed: 6': 'Final_Invoice_CNDN_Date'}, inplace=True)
+    df4.rename(columns={'Unnamed: 7': 'Invoice_CNDN_Value'}, inplace=True)
     df4.rename(columns={'Unnamed: 8': 'Place_Of_Supply'}, inplace=True)
     df4.rename(columns={'Unnamed: 9': 'Supply_Attract_Reverse_Charge'}, inplace=True)
-    df4.rename(columns={'Unnamed: 10': 'GST_Rate'}, inplace=True)
-    df4.rename(columns={'Unnamed: 11': 'Taxable_Value_Rs'}, inplace=True)
-    df4.rename(columns={'Unnamed: 12': 'IGST_Rs'}, inplace=True)
-    df4.rename(columns={'Unnamed: 13': 'CGST_Rs'}, inplace=True)
-    df4.rename(columns={'Unnamed: 14': 'SGST_Rs'}, inplace=True)
-    df4.rename(columns={'Unnamed: 15': 'Cess'}, inplace=True)
+    df4.rename(columns={'Unnamed: 10': 'Tax_Rate'}, inplace=True)
+    df4.rename(columns={'Unnamed: 11': 'Taxable_Value'}, inplace=True)
+    df4.rename(columns={'Unnamed: 12': 'IGST_Amount'}, inplace=True)
+    df4.rename(columns={'Unnamed: 13': 'CGST_Amount'}, inplace=True)
+    df4.rename(columns={'Unnamed: 14': 'SGST_Amount'}, inplace=True)
+    df4.rename(columns={'Unnamed: 15': 'Cess_Amount'}, inplace=True)
     df4.rename(columns={'Unnamed: 16': 'GSTR_1_5_Filing_Status'}, inplace=True)
-    df4.rename(columns={'Unnamed: 17': 'GSTR_1_5_Filing_Date'}, inplace=True)
-    df4.rename(columns={'Unnamed: 18': 'GSTR_1_5_Filing_Period'}, inplace=True)
+    df4.rename(columns={'Unnamed: 17': 'Supplier_Filing_Date'}, inplace=True)
+    df4.rename(columns={'Unnamed: 18': 'Supplier_Filing_Period'}, inplace=True)
     df4.rename(columns={'Unnamed: 19': 'GSTR_3B_Filing_Status'}, inplace=True)
     df4.rename(columns={'Unnamed: 20': 'Effective_date_of_cancellation'}, inplace=True)
     df4.rename(columns={'Unnamed: 21': 'Amendment_made_if_any'}, inplace=True)
     df4.rename(columns={'Unnamed: 22': 'Original_tax_period_in_which_reported'}, inplace=True)
 
     # here we will remove the rows, in which the invoice number has  a total
-    filt = df4['Inv_CN_DN_Number_Revised'].str.contains('Total', na=False)
+    filt = df4['Final_Invoice_CNDN_No'].str.contains('Total', na=False)
 
     df4 = df4[~filt]
 
-    df4['Inv_CN_DN_Date_Text'] = df4['Inv_CN_DN_Date_Original'].str.replace("-", ".")
-    df4['Total_Tax'] = df4['IGST_Rs'] + df4['CGST_Rs'] + df4['SGST_Rs']
-    df4['Unique_ID'] = df4['GSTIN_of_Supplier'] + "/" + df4['Inv_CN_DN_Number_Original'] + "/" + df4[
+    df4['Inv_CN_DN_Date_Text'] = df4['Final_Invoice_CNDN_Date'].str.replace("-", ".")
+    df4['Total_Tax'] = df4['IGST_Amount'] + df4['CGST_Amount'] + df4['SGST_Amount']
+    df4['Unique_ID'] = df4['GSTIN_of_Supplier'] + "/" + df4['Final_Invoice_CNDN_No'] + "/" + df4[
         'Inv_CN_DN_Date_Text']
-    df4["Inv_CN_DN_Date_Revised_Unique"] = df4['Inv_CN_DN_Date_Revised'].str.replace("-", ".")
+#     df4["Inv_CN_DN_Date_Revised_Unique"] = df4['Inv_CN_DN_Date_Revised'].str.replace("-", ".")
 
-    df4['Sheet_Name'] = ("B2BA")
+    df4['GSTR2A_Table'] = ("B2BA")
 
     df4['PAN_Number'] = df4["GSTIN_of_Supplier"].apply(lambda x: x[2:12:1])
 
     df4 = df4.replace(np.nan, "", regex=True)
 
-    # A.3 : This will iterate through the CDNR file
-
-    print("We are working on CDNR sheet of all the monthly GSTR2A..Please wait")
-
-    df2 = pd.DataFrame()
-
-    for files in filenames:
-        df = pd.read_excel(files, sheet_name=3)
-
-        df1 = df.drop([0, 1, 2, 3, 4], axis=0)
-
-        df1 = df1.dropna(how='all')
-
-        df1['File_name'] = files
-
-        df2 = df2.append(df1)
 
     # this is used for deleting all the rows which are totally blank
-    df5 = df2.dropna(how='all')
+    df5 = df_all_cdnr.dropna(how='all')
 
     # this is used for renaming the names of the columns
 
     df5.rename(
         columns={'                                             Goods and Services Tax - GSTR-2A': 'GSTIN_of_Supplier'},
         inplace=True)
-    df5.rename(columns={'Unnamed: 1': 'Legal_Name_Of Supplier'}, inplace=True)
-    df5.rename(columns={'Unnamed: 2': 'Credit_Debit_Note_Original'}, inplace=True)
-    df5.rename(columns={'Unnamed: 3': 'Inv_CN_DN_Number_Original'}, inplace=True)
-    df5.rename(columns={'Unnamed: 4': 'Inv_CN_DN_Type_Original'}, inplace=True)
-    df5.rename(columns={'Unnamed: 5': 'Inv_CN_DN_Date_Original'}, inplace=True)
-    df5.rename(columns={'Unnamed: 6': 'Inv_CN_DN_Value_Original'}, inplace=True)
+    df5.rename(columns={'Unnamed: 1': 'Trade_Name_of_Supplier'}, inplace=True)
+    df5.rename(columns={'Unnamed: 2': 'Final_Note_Supply_Type'}, inplace=True)
+    df5.rename(columns={'Unnamed: 3': 'Final_Invoice_CNDN_No'}, inplace=True)
+    df5.rename(columns={'Unnamed: 4': 'Final_Inv_CNDN_Type'}, inplace=True)
+    df5.rename(columns={'Unnamed: 5': 'Final_Invoice_CNDN_Date'}, inplace=True)
+    df5.rename(columns={'Unnamed: 6': 'Invoice_CNDN_Value'}, inplace=True)
     df5.rename(columns={'Unnamed: 7': 'Place_Of_Supply'}, inplace=True)
     df5.rename(columns={'Unnamed: 8': 'Supply_Attract_Reverse_Charge'}, inplace=True)
-    df5.rename(columns={'Unnamed: 9': 'GST_Rate'}, inplace=True)
-    df5.rename(columns={'Unnamed: 10': 'Taxable_Value_Rs'}, inplace=True)
-    df5.rename(columns={'Unnamed: 11': 'IGST_Rs'}, inplace=True)
-    df5.rename(columns={'Unnamed: 12': 'CGST_Rs'}, inplace=True)
-    df5.rename(columns={'Unnamed: 13': 'SGST_Rs'}, inplace=True)
-    df5.rename(columns={'Unnamed: 14': 'Cess'}, inplace=True)
+    df5.rename(columns={'Unnamed: 9': 'Tax_Rate'}, inplace=True)
+    df5.rename(columns={'Unnamed: 10': 'Taxable_Value'}, inplace=True)
+    df5.rename(columns={'Unnamed: 11': 'IGST_Amount'}, inplace=True)
+    df5.rename(columns={'Unnamed: 12': 'CGST_Amount'}, inplace=True)
+    df5.rename(columns={'Unnamed: 13': 'SGST_Amount'}, inplace=True)
+    df5.rename(columns={'Unnamed: 14': 'Cess_Amount'}, inplace=True)
     df5.rename(columns={'Unnamed: 15': 'GSTR_1_5_Filing_Status'}, inplace=True)
-    df5.rename(columns={'Unnamed: 16': 'GSTR_1_5_Filing_Date'}, inplace=True)
-    df5.rename(columns={'Unnamed: 17': 'GSTR_1_5_Filing_Period'}, inplace=True)
+    df5.rename(columns={'Unnamed: 16': 'Supplier_Filing_Date'}, inplace=True)
+    df5.rename(columns={'Unnamed: 17': 'Supplier_Filing_Period'}, inplace=True)
     df5.rename(columns={'Unnamed: 18': 'GSTR_3B_Filing_Status'}, inplace=True)
     df5.rename(columns={'Unnamed: 19': 'Amendment_made_if_any'}, inplace=True)
     df5.rename(columns={'Unnamed: 20': 'Tax_Period_in_which_Amended'}, inplace=True)
     df5.rename(columns={'Unnamed: 21': 'Effective_date_of_cancellation'}, inplace=True)
-    df5.rename(columns={'Unnamed: 22': 'Source'}, inplace=True)
+    df5.rename(columns={'Unnamed: 22': 'Source_Type'}, inplace=True)
     df5.rename(columns={'Unnamed: 23': 'IRN'}, inplace=True)
-    df5.rename(columns={'Unnamed: 24': 'IRN_Date'}, inplace=True)
+    df5.rename(columns={'Unnamed: 24': 'IRN_Generate_Date'}, inplace=True)
 
     # here we will remove the rows, in which the invoice number has  a total
-    filt = df5['Inv_CN_DN_Number_Original'].str.contains('Total', na=False)
+    filt = df5['Final_Invoice_CNDN_No'].str.contains('Total', na=False)
 
     df5 = df5[~filt]
 
-    df5['Inv_CN_DN_Date_Text'] = df5['Inv_CN_DN_Date_Original'].str.replace("-", ".")
-    df5['Total_Tax'] = df5['IGST_Rs'] + df5['CGST_Rs'] + df5['SGST_Rs']
-    df5['Unique_ID'] = df5['GSTIN_of_Supplier'] + "/" + df5['Inv_CN_DN_Number_Original'] + "/" + df5[
+    df5['Inv_CN_DN_Date_Text'] = df5['Final_Invoice_CNDN_Date'].str.replace("-", ".")
+    df5['Total_Tax'] = df5['IGST_Amount'] + df5['CGST_Amount'] + df5['SGST_Amount']
+    df5['Unique_ID'] = df5['GSTIN_of_Supplier'] + "/" + df5['Final_Invoice_CNDN_No'] + "/" + df5[
         'Inv_CN_DN_Date_Text']
 
-    df5['Sheet_Name'] = ("CDNR")
+    df5['GSTR2A_Table'] = ("CDNR")
 
     df5['PAN_Number'] = df5["GSTIN_of_Supplier"].apply(lambda x: x[2:12:1])
 
     df5 = df5.replace(np.nan, "", regex=True)
 
-    # A.2 : This will iterate through the CDNRA file
 
-    print("We are working on CDNRA sheet of all the monthly GSTR2A..Please wait")
-
-    df2 = pd.DataFrame()
-
-    for files in filenames:
-        df = pd.read_excel(files, sheet_name=4)
-
-        df1 = df.drop([0, 1, 2, 3, 4, 5], axis=0)
-
-        df1 = df1.dropna(how='all')
-
-        df1['File_name'] = files
-
-        df2 = df2.append(df1)
 
     # this is used for deleting all the rows which are totally blank
-    df6 = df2.dropna(how='all')
+    
+    df6 = df_all_cdnra.dropna(how='all')
 
     # this is used for renaming the names of the columns
 
-    df6.rename(columns={'                             Goods and Services Tax - GSTR2A': 'Credit_Debit_Note_Original'},
+    df6.rename(columns={'                             Goods and Services Tax - GSTR2A': 'Initial_Note_Supply_Type'},
                inplace=True)
-    df6.rename(columns={'Unnamed: 1': 'Inv_CN_DN_Number_Original'}, inplace=True)
-    df6.rename(columns={'Unnamed: 2': 'Inv_CN_DN_Date_Original'}, inplace=True)
+    df6.rename(columns={'Unnamed: 1': 'Initial_Inv_CNDN_No'}, inplace=True)
+    df6.rename(columns={'Unnamed: 2': 'Initial_Inv_CNDN_Date'}, inplace=True)
     df6.rename(columns={'Unnamed: 3': 'GSTIN_of_Supplier'}, inplace=True)
-    df6.rename(columns={'Unnamed: 4': 'Legal_Name_Of Supplier'}, inplace=True)
-    df6.rename(columns={'Unnamed: 5': 'Credit_Debit_Note_Revised'}, inplace=True)
-    df6.rename(columns={'Unnamed: 6': 'Inv_CN_DN_Number_Revised'}, inplace=True)
-    df6.rename(columns={'Unnamed: 7': 'Inv_CN_DN_Type_Revised'}, inplace=True)
-    df6.rename(columns={'Unnamed: 8': 'Inv_CN_DN_Date_Revised'}, inplace=True)
-    df6.rename(columns={'Unnamed: 9': 'Inv_CN_DN_Value_Revised'}, inplace=True)
+    df6.rename(columns={'Unnamed: 4': 'Trade_Name_of_Supplier'}, inplace=True)
+    df6.rename(columns={'Unnamed: 5': 'Final_Note_Supply_Type'}, inplace=True)
+    df6.rename(columns={'Unnamed: 6': 'Final_Invoice_CNDN_No'}, inplace=True)
+    df6.rename(columns={'Unnamed: 7': 'Final_Inv_CNDN_Type'}, inplace=True)
+    df6.rename(columns={'Unnamed: 8': 'Final_Invoice_CNDN_Date'}, inplace=True)
+    df6.rename(columns={'Unnamed: 9': 'Invoice_CNDN_Value'}, inplace=True)
     df6.rename(columns={'Unnamed: 10': 'Place_Of_Supply'}, inplace=True)
     df6.rename(columns={'Unnamed: 11': 'Supply_Attract_Reverse_Charge'}, inplace=True)
-    df6.rename(columns={'Unnamed: 12': 'GST_Rate'}, inplace=True)
-    df6.rename(columns={'Unnamed: 13': 'Taxable_Value_Rs'}, inplace=True)
-    df6.rename(columns={'Unnamed: 14': 'IGST_Rs'}, inplace=True)
-    df6.rename(columns={'Unnamed: 15': 'CGST_Rs'}, inplace=True)
-    df6.rename(columns={'Unnamed: 16': 'SGST_Rs'}, inplace=True)
-    df6.rename(columns={'Unnamed: 17': 'Cess'}, inplace=True)
+    df6.rename(columns={'Unnamed: 12': 'Tax_Rate'}, inplace=True)
+    df6.rename(columns={'Unnamed: 13': 'Taxable_Value'}, inplace=True)
+    df6.rename(columns={'Unnamed: 14': 'IGST_Amount'}, inplace=True)
+    df6.rename(columns={'Unnamed: 15': 'CGST_Amount'}, inplace=True)
+    df6.rename(columns={'Unnamed: 16': 'SGST_Amount'}, inplace=True)
+    df6.rename(columns={'Unnamed: 17': 'Cess_Amount'}, inplace=True)
     df6.rename(columns={'Unnamed: 18': 'GSTR_1_5_Filing_Status'}, inplace=True)
-    df6.rename(columns={'Unnamed: 19': 'GSTR_1_5_Filing_Date'}, inplace=True)
-    df6.rename(columns={'Unnamed: 20': 'GSTR_1_5_Filing_Period'}, inplace=True)
+    df6.rename(columns={'Unnamed: 19': 'Supplier_Filing_Date'}, inplace=True)
+    df6.rename(columns={'Unnamed: 20': 'Supplier_Filing_Period'}, inplace=True)
     df6.rename(columns={'Unnamed: 21': 'GSTR_3B_Filing_Status'}, inplace=True)
     df6.rename(columns={'Unnamed: 22': 'Amendment_made_if_any'}, inplace=True)
     df6.rename(columns={'Unnamed: 23': 'Original_tax_period_in_which_reported'}, inplace=True)
     df6.rename(columns={'Unnamed: 24': 'Effective_date_of_cancellation'}, inplace=True)
 
     # here we will remove the rows, in which the invoice number has  a total
-    filt = df6['Inv_CN_DN_Number_Revised'].str.contains('Total', na=False)
+    filt = df6['Final_Invoice_CNDN_No'].str.contains('Total', na=False)
 
     df6 = df6[~filt]
 
-    df6['Inv_CN_DN_Date_Text'] = df6['Inv_CN_DN_Date_Original'].str.replace("-", ".")
-    df6['Total_Tax'] = df6['IGST_Rs'] + df6['CGST_Rs'] + df6['SGST_Rs']
-    df6['Unique_ID'] = df6['GSTIN_of_Supplier'] + "/" + df6['Inv_CN_DN_Number_Original'] + "/" + df6[
+    df6['Inv_CN_DN_Date_Text'] = df6['Final_Invoice_CNDN_Date'].str.replace("-", ".")
+    df6['Total_Tax'] = df6['IGST_Amount'] + df6['CGST_Amount'] + df6['SGST_Amount']
+    df6['Unique_ID'] = df6['GSTIN_of_Supplier'] + "/" + df6['Final_Invoice_CNDN_No'] + "/" + df6[
         'Inv_CN_DN_Date_Text']
 
-    df6["Inv_CN_DN_Date_Revised_Unique"] = df6['Inv_CN_DN_Date_Revised'].str.replace("-", ".")
+#     df6["Inv_CN_DN_Date_Revised_Unique"] = df6['Inv_CN_DN_Date_Revised'].str.replace("-", ".")
 
-    df6['Sheet_Name'] = ("CDNRA")
+    df6['GSTR2A_Table'] = ("CDNRA")
 
     df6['PAN_Number'] = df6["GSTIN_of_Supplier"].apply(lambda x: x[2:12:1])
 
@@ -631,23 +634,30 @@ def gstr2a_merge(filepath):
 
     df10 = df10.replace(np.nan, "", regex=True)
 
-    df10["Ultimate_Unique"] = df10["Sheet_Name"] + "/" + df10["Supply_Attract_Reverse_Charge"] + df10[
+    df10["Ultimate_Unique"] = df10["GSTR2A_Table"] + "/" + df10["Supply_Attract_Reverse_Charge"] + df10[
         "GSTR_1_5_Filing_Status"] + "/" + df10["Unique_ID"]
 
-    df10["PAN_3_Way_Key"] = np.where(df10["Sheet_Name"] == "B2BA",
-                                     df10["PAN_Number"] + "/" + df10["Inv_CN_DN_Number_Revised"] + "/"
-                                     + df10["Inv_CN_DN_Date_Revised_Unique"],
-                                     df10["PAN_Number"] + "/" + df10["Inv_CN_DN_Number_Original"]
+    
+    #this concatanating for B2BA cases, does nt require to use np.where coz we have now recitifed and kept as Final& Jnitial
+    
+    df10["PAN_3_Way_Key"] = np.where(df10["GSTR2A_Table"] == "B2BA",
+                                     df10["PAN_Number"] + "/" + df10["Final_Invoice_CNDN_No"] + "/"
+                                     + df10["Inv_CN_DN_Date_Text"],
+                                     df10["PAN_Number"] + "/" + df10["Final_Invoice_CNDN_No"]
                                      + "/" + df10["Inv_CN_DN_Date_Text"])
 
-    df10["PAN_2_Way_Key_PAN_InvNo"] = np.where(df10["Sheet_Name"] == "B2BA",
-                                               df10["PAN_Number"] + "/" + df10["Inv_CN_DN_Number_Revised"]
-                                               , df10["PAN_Number"] + "/" + df10["Inv_CN_DN_Number_Original"])
+    df10["PAN_2_Way_Key_PAN_InvNo"] = np.where(df10["GSTR2A_Table"] == "B2BA",
+                                               df10["PAN_Number"] + "/" + df10["Final_Invoice_CNDN_No"]
+                                               , df10["PAN_Number"] + "/" + df10["Final_Invoice_CNDN_No"])
 
-    df10["PAN_2_Way_Key_PAN_InvDt"] = np.where(df10["Sheet_Name"] == "B2BA",
-                                               df10["PAN_Number"] + "/" + df10["Inv_CN_DN_Date_Revised_Unique"]
+    df10["PAN_2_Way_Key_PAN_InvDt"] = np.where(df10["GSTR2A_Table"] == "B2BA",
+                                               df10["PAN_Number"] + "/" + df10["Inv_CN_DN_Date_Text"]
                                                , df10["PAN_Number"] + "/" + df10["Inv_CN_DN_Date_Text"])
 
+
+    #Still, this np.where is not deleted for future reference
+    
+    
     # maiking a sheet with person who did not file the GSTR 1
 
     df11 = df10[df10['GSTR_1_5_Filing_Status'] == "N"]
@@ -662,22 +672,22 @@ def gstr2a_merge(filepath):
 
     # saving the file with the name "Combined"
 
-    extension = os.path.splitext(filepath)[1]
-    filename = os.path.splitext(filepath)[0]
-    pth = os.path.dirname(filepath)
-    newfile = os.path.join(pth, "Merged" + 'GSTR2A_all_Files_by_Effcorp' + extension)
+#     extension = ".xlsx"
+#     filename = os.path.splitext(filepath)[0]
+#     pth = os.path.dirname(filepath)
+    newfile = os.path.join(folder, "Merged_" + 'GSTR2A_all_Files_by_Effcorp.xlsx' )
 
-    writer = pd.ExcelWriter(newfile, engine='openpyxl')
+    writer = pd.ExcelWriter(newfile,engine='xlsxwriter',engine_kwargs={'options': {'strings_to_numbers': True}})
 
     print("Please wait.. we are creating different sheets and finalizing the file.....")
 
-    df3.to_excel(writer, sheet_name="B2B")
+    df3.to_excel(writer, sheet_name="B2B",index=False)
 
-    df4.to_excel(writer, sheet_name="B2BA")
+    df4.to_excel(writer, sheet_name="B2BA",index=False)
 
-    df5.to_excel(writer, sheet_name="CDNR")
+    df5.to_excel(writer, sheet_name="CDNR",index=False)
 
-    df6.to_excel(writer, sheet_name="CDNRA")
+    df6.to_excel(writer, sheet_name="CDNRA",index=False)
 
     titles = list(df10.columns)
 
@@ -699,7 +709,7 @@ def gstr2a_merge(filepath):
                                                                                              32], titles[33], titles[
                                                                                              34], titles[35]
 
-    df10[titles].to_excel(writer, sheet_name="All_Combined")
+    df10[titles].to_excel(writer, sheet_name="All_Combined",index=False)
 
     titles = list(df11.columns)
 
@@ -721,7 +731,7 @@ def gstr2a_merge(filepath):
                                                                                              32], titles[33], titles[
                                                                                              34], titles[35]
 
-    df11[titles].to_excel(writer, sheet_name="GSTR_1_Not Filed")
+    df11[titles].to_excel(writer, sheet_name="GSTR_1_Not Filed",index=False)
 
     titles = list(df12.columns)
 
@@ -743,7 +753,7 @@ def gstr2a_merge(filepath):
                                                                                              32], titles[33], titles[
                                                                                              34], titles[35]
 
-    df12[titles].to_excel(writer, sheet_name="GSTR_Filed_RCM_Yes")
+    df12[titles].to_excel(writer, sheet_name="GSTR_Filed_RCM_Yes",index=False)
 
     titles = list(df13.columns)
 
@@ -765,7 +775,7 @@ def gstr2a_merge(filepath):
                                                                                              32], titles[33], titles[
                                                                                              34], titles[35]
 
-    df13[titles].to_excel(writer, sheet_name="Tax_Zero_Cases")
+    df13[titles].to_excel(writer, sheet_name="Tax_Zero_Cases",index=False)
 
     titles = list(df14.columns)
 
@@ -787,7 +797,7 @@ def gstr2a_merge(filepath):
                                                                                              32], titles[33], titles[
                                                                                              34], titles[35]
 
-    df14[titles].to_excel(writer, sheet_name="Working_Cases")
+    df14[titles].to_excel(writer, sheet_name="Working_Cases",index=False)
 
     writer.save()
     writer.close()
@@ -1756,6 +1766,54 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
 
 
+def rename_r1_columns(dataframe):
+
+    """
+
+    This is a support function for the gstr2B to Excel conversion
+
+
+    """
+    
+    dataframe.rename(columns={"idt":"Final_Invoice_CNDN_Date",
+                "val":"Invoice_CNDN_Value",
+                "rchrg":"Supply_Attract_Reverse_Charge",
+                "itcavl":"ITC_Available",
+                "diffprcnt":"Applicable_Percent_TaxRate",
+                "pos":"Place_Of_Supply",
+                "inv_typ":"Final_Inv_CNDN_Type",
+                "inum":"Final_Invoice_CNDN_No",
+                "rsn":"Reason",
+                "samt":"SGST_Amount",
+                "rt":"Tax_Rate",
+                "num":"Check_num",
+                "txval":"Taxable_Value",
+                "camt":"CGST_Amount",
+                "csamt":"Cess_Amount",
+                "ctin":"GSTIN_of_Customer",
+                "iamt":"IGST_Amount",
+                "irn":"IRN",
+                "cfs":"Counter_Party_Filing_Status",
+                "cflag":"Counter_Party_Action",
+                "updby":"Uploaded_By",
+                "chksum":"Check_Sum",
+                "flag":"Tax_Payer_Action",
+                "irngendate":"IRN_Generate_Date",
+                "srctyp":"Source_Type",
+                "GSTR2B-Table":"GSTR2B-Table",
+                "rtnprd":"GSTR2B_Period",
+                "gstin":"Recipient_GSTIN",
+                "Json File Name":"JSON_Source_File",
+                "typ":"Final_Inv_CNDN_Type",
+                "sply_ty":"Supply_Type",
+                "nt_dt":"Final_Invoice_CNDN_Date",
+                "nt_num":"Final_Invoice_CNDN_No",
+                "d_flag":"d_flag",
+                "exp_typ":"Final_Inv_CNDN_Type",
+                "File_Name":"Source_Excel_File"},inplace=True)
+    
+
+
 
 def flatten_dict(dic):
     """
@@ -1885,6 +1943,10 @@ def expand_list(list_dic):
 
 
 
+
+
+
+
 def gstr1_to_excel(filepath):
     """
     This is a very easy to use funcion to extract the json data of GSTR1 into an excel file.
@@ -1930,6 +1992,8 @@ def gstr1_to_excel(filepath):
 
     df1 = pd.DataFrame()
     df1.to_excel(writer1, sheet_name="Summary_GSTR1", index=False)
+    
+    
 
     writer1.save()
 
@@ -1972,11 +2036,15 @@ def gstr1_to_excel(filepath):
     ws["A22"].value = "CREDIT NOTE / DEBIT NOTE (CDNR)"
 
     ws["A24"].value = "HSN SUMMARY"
+    
+    
 
     with open(filepath) as json_file:
         data = json.load(json_file)
 
     dic_keys = data.keys
+    
+    df_all_combined=pd.DataFrame()
 
     for i in dic_keys():
 
@@ -2011,30 +2079,74 @@ def gstr1_to_excel(filepath):
             print("Fetching the B2B data, Please wait for some time...!!")
             b2b_data = data[i]
             dic_b2b = expand_list(b2b_data)
-            df_b2b = pd.DataFrame(dic_b2b)
-            df_b2b["GSTR-Table"] = "B2B"
+            
+            try:
+                df_b2b = pd.DataFrame(dic_b2b)
+            except ValueError:
+                df_b2b = pd.DataFrame(dic_b2b, index=[0])
+
+
+
+
+            # df_b2b = pd.DataFrame(dic_b2b)
+            df_b2b["GSTR1-Table"] = "B2B"
             df_b2b["Json File Name"] = filepath
+            
+#             rename_r1_columns(df_b2b)
+            
             df_b2b.to_excel(writer, sheet_name='B2B_DATA', index=False)
+            
+            df_all_combined=df_all_combined.append(df_b2b)
+
 
         elif i == "b2cl":
 
             print("Fetching the B2CL data, Please wait for some time...!!")
             b2cl_data = data[i]
             dic_b2cl = expand_list(b2cl_data)
-            df_b2cl = pd.DataFrame(dic_b2cl)
-            df_b2cl["GSTR-Table"] = "B2C-L"
+
+
+            try:
+                df_b2cl = pd.DataFrame(dic_b2cl)
+            except ValueError:
+                df_b2cl = pd.DataFrame(dic_b2cl, index=[0])
+
+            # df_b2cl = pd.DataFrame(dic_b2cl)
+            df_b2cl["GSTR1-Table"] = "B2C-L"
             df_b2cl["Json File Name"] = filepath
+            
+            
+#             rename_r1_columns(df_b2cl)
+            
             df_b2cl.to_excel(writer, sheet_name='B2CL_DATA', index=False)
+            
+            df_all_combined=df_all_combined.append(df_b2cl)
 
         elif i == "cdnr":
 
             print("Fetching the CDNR data, Please wait for some time...!!")
             cdnr_data = data[i]
             dic_cdnr = expand_list(cdnr_data)
-            df_cdnr = pd.DataFrame(dic_cdnr)
-            df_cdnr["GSTR-Table"] = "CDNR"
+
+            try:
+                df_cdnr = pd.DataFrame(dic_cdnr)
+            except ValueError:
+                df_cdnr = pd.DataFrame(dic_cdnr, index=[0])
+
+            # df_cdnr = pd.DataFrame(dic_cdnr)
+            df_cdnr["GSTR1-Table"] = "CDNR"
             df_cdnr["Json File Name"] = filepath
+            
+            
+            
+#             rename_r1_columns(df_cdnr)
+            
             df_cdnr.to_excel(writer, sheet_name='CDNR_DATA', index=False)
+            
+            df_cdnr.rename(columns={"inv_typ":"Note_Supply_Type",
+                "ntty":"Final_Inv_CNDN_Type"},inplace=True)
+            
+            df_all_combined=df_all_combined.append(df_cdnr)
 
 
         elif i == "exp":
@@ -2042,40 +2154,89 @@ def gstr1_to_excel(filepath):
             print("Fetching the Export data, Please wait for some time...!!")
             exp_data = data[i]
             dic_exp = expand_list(exp_data)
-            df_exp = pd.DataFrame(dic_exp)
-            df_exp["GSTR-Table"] = "EXPORT"
+
+            try:
+                df_exp = pd.DataFrame(dic_exp)
+            except ValueError:
+                df_exp = pd.DataFrame(dic_exp, index=[0])
+
+
+            # df_exp = pd.DataFrame(dic_exp)
+            df_exp["GSTR1-Table"] = "EXPORT"
             df_exp["Json File Name"] = filepath
+            
+            
+#             rename_r1_columns(df_exp)
+            
             df_exp.to_excel(writer, sheet_name='EXPORT_DATA', index=False)
+            
+            
+            df_all_combined=df_all_combined.append(df_exp)
 
         elif i == "b2cs":
 
             print("Fetching the B2CS data, Please wait for some time...!!")
             b2cs_data = data[i]
             dic_b2cs = expand_list(b2cs_data)
-            df_b2cs = pd.DataFrame(dic_b2cs)
-            df_b2cs["GSTR-Table"] = "B2C-S"
+
+            try:
+                df_b2cs = pd.DataFrame(dic_b2cs)
+            except ValueError:
+                df_b2cs = pd.DataFrame(dic_b2cs, index=[0])
+
+
+            # df_b2cs = pd.DataFrame(dic_b2cs)
+            df_b2cs["GSTR1-Table"] = "B2C-S"
             df_b2cs["Json File Name"] = filepath
+            
+            
+#             rename_r1_columns(df_b2cs)
+            
             df_b2cs.to_excel(writer, sheet_name='B2CS_DATA', index=False)
+            
+            
+            df_all_combined=df_all_combined.append(df_b2cs)
 
         elif i == "hsn":
 
             print("Getting the HSN Summary For you...!!")
             hsn_data = data[i]
             dic_hsn = flatten_dict(hsn_data)
-            df_hsn = pd.DataFrame(dic_hsn)
+
+            try:
+                df_hsn = pd.DataFrame(dic_hsn)
+            except ValueError:
+                df_hsn = pd.DataFrame(dic_hsn, index=[0])
+
+
+            # df_hsn = pd.DataFrame(dic_hsn)
             df_hsn.to_excel(writer, sheet_name='HSN_DATA', index=False)
 
         elif i == "nil":
             nil_data = data[i]
             dic_nil = flatten_dict(nil_data)
-            df_nil = pd.DataFrame(dic_nil)
+
+            try:
+                df_nil = pd.DataFrame(dic_nil)
+            except ValueError:
+                df_nil = pd.DataFrame(dic_nil, index=[0])
+
+
+            # df_nil = pd.DataFrame(dic_nil)
             df_nil.to_excel(writer, sheet_name='NIL_NONGST_DATA', index=False)
 
         elif i == "doc_issue":
             print("Getting the Document Series Summary For you...!!")
             doc_data = data[i]
             dic_doc = flatten_dict(doc_data)
-            df_doc = pd.DataFrame(dic_doc)
+
+            try:
+                df_doc = pd.DataFrame(dic_doc)
+            except ValueError:
+                df_doc = pd.DataFrame(dic_doc, index=[0])
+
+
+            # df_doc = pd.DataFrame(dic_doc)
             df_doc.to_excel(writer, sheet_name='DOC_SERIES_DATA', index=False)
 
         elif i == "fil_dt":
@@ -2084,28 +2245,53 @@ def gstr1_to_excel(filepath):
 
         else:
             add_case = data[i]
+            
             if isinstance(add_case, list):
                 dic_add_case = expand_list(add_case)
-                df_add_case = pd.DataFrame(dic_add_case)
-                df_add_case["GSTR-Table"] = i
+
+                try:
+                    df_add_case = pd.DataFrame(dic_add_case)
+                except ValueError:
+                    df_add_case = pd.DataFrame(dic_add_case, index=[0])
+
+
+                # df_add_case = pd.DataFrame(dic_add_case)
+                df_add_case["GSTR1-Table"] = i
                 df_add_case.to_excel(writer, sheet_name=i, index=False)
+            
             elif isinstance(add_case, dict):
                 dic_add_case = flatten_dict(add_case)
-                df_add_case = pd.DataFrame(dic_add_case)
-                df_add_case["GSTR-Table"] = i
+
+                try:
+                    df_add_case = pd.DataFrame(dic_add_case)
+                except ValueError:
+                    df_add_case = pd.DataFrame(dic_add_case, index=[0])
+
+
+                # df_add_case = pd.DataFrame(dic_add_case)
+                df_add_case["GSTR1-Table"] = i
                 df_add_case.to_excel(writer, sheet_name=i, index=False)
             else:
                 pass
 
-    wb.save(fullpath2)
-    writer.save()
+#     wb.save(fullpath2)
+#     writer.save()
     #
-    # print("Consolidating All Major Tables in Single Sheet for you..!!")
-    # df_comb = pd.concat([df_b2b, df_b2cl, df_cdnr, df_exp, df_b2cs])
-    # df_comb.to_excel(writer, sheet_name="All_Combined_Case", index=False)
+    
+#     tab_list=["b2b","b2cl","b2cs","cdnr"]
+    
+#     mask1=
+    print(data.keys())
+    
+    print("Consolidating All Major Tables in Single Sheet for you..!!")
+#     df_comb = pd.concat([df_b2b, df_b2cl, df_cdnr, df_exp, df_b2cs])
+    
+    
+    rename_r1_columns(df_all_combined)
+    df_all_combined.to_excel(writer, sheet_name="effcorp_all_combined", index=False)
 
     wb.save(fullpath2)
-    # writer.save()
+    writer.save()
 
     try:
         ws["B18"].value = len(df_b2b["ctin"])
@@ -2210,6 +2396,8 @@ def gstr1_to_excel(filepath):
 
 
 
+
+
 def merge_gstr2b_excel(folder):
 
 
@@ -2240,7 +2428,7 @@ def merge_gstr2b_excel(folder):
     
     
           
-    path=os.path.join(folder + "\All_Combined_GSTR2B.xlsx")
+    path=os.path.join(folder , "Combined_GSTR2B_All.xlsx")
 
     writer=pd.ExcelWriter(path,engine='xlsxwriter',engine_kwargs={'options': {'strings_to_numbers': True}})
   
@@ -2644,6 +2832,7 @@ def gstr2b_to_excel(filepath):
     
     
     writer = pd.ExcelWriter(newfile, engine='xlsxwriter', options={'strings_to_formulas': True})
+    
 
 #     writer=pd.ExcelWriter(newfile,engine='openpyxl')
 
@@ -2686,13 +2875,15 @@ def gstr2b_to_excel(filepath):
                 df_b2b["GSTR2B_Table"] = i
                 df_b2b["rtnprd"]=return_period
                 df_b2b["gstin"]=rec_gstin
-                df_b2b["Json_File_Name"]=filepath
+                df_b2b["Json File Name"]=filepath
                 
-                rename_2b_columns(df_b2b)
                 
 
                 
                 df_b2b.to_excel(writer, sheet_name=str(i+'_data'), index=False)
+                
+                rename_2b_columns(df_b2b)
+                
                 print(f"{i} Data converted to Excel....!!")
 
 #                 writer.save()
@@ -2715,10 +2906,13 @@ def gstr2b_to_excel(filepath):
                 df_b2ba["Json File Name"]=filepath
                 
                 
-                rename_2b_columns(df_b2ba)
                 
                 
                 df_b2ba.to_excel(writer, sheet_name=str(i+'_data'), index=False)
+                
+                rename_2b_columns(df_b2ba)
+                
+                
                 print(f"{i} Data converted to Excel....!!")
 
 #                 writer.save()
@@ -2740,10 +2934,12 @@ def gstr2b_to_excel(filepath):
                 df_cdnr["Json File Name"] = filepath
                 
                 
-                rename_2b_columns(df_cdnr)
                 
                 
                 df_cdnr.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+                
+                rename_2b_columns(df_cdnr)
+                
                 print(f"{i} Data converted to Excel....!!")
 
 #                 writer.save()
@@ -2765,9 +2961,11 @@ def gstr2b_to_excel(filepath):
                 df_cdnra["gstin"] = rec_gstin
                 df_cdnra["Json File Name"] = filepath
                 
-                rename_2b_columns(df_cdnra)
                 
                 df_cdnra.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+                
+                rename_2b_columns(df_cdnra)
+                
                 print(f"{i} Data converted to Excel....!!")
 
 #                 writer.save()
@@ -2791,9 +2989,11 @@ def gstr2b_to_excel(filepath):
                 df_isd["gstin"] = rec_gstin
                 df_isd["Json File Name"] = filepath
                 
-                rename_2b_columns(df_isd)
                 
                 df_isd.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+                
+                rename_2b_columns(df_isd)
+                
                 print(f"{i} Data converted to Excel....!!")
 
 #                 writer.save()
@@ -2813,17 +3013,55 @@ def gstr2b_to_excel(filepath):
                 df_impg["gstin"] = rec_gstin
                 df_impg["Json File Name"] = filepath
                 
-                rename_2b_columns(df_impg)
+                
                 
                 df_impg.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+                
+                rename_2b_columns(df_impg)
                 print(f"{i} Data converted to Excel....!!")
 
 #                 writer.save()
 
             else:
+        
                 pass
+        
+        #below add_case not required in gstr2b, coz we have only defined tables in 2b, unlike gstr1 , where we can have lots of tables
+        #in form of ammendments, gstr1 can have any number of tables, which is not the case in GSTR2B
+        #so, the below block of code not required
+            
+#                 add_case = data[i]
 
-        print(f"All Sheets Have been created separateky in same Excel File named {newfile}")
+#                 if isinstance(add_case, list):
+#                     dic_add_case = expand_list(add_case)
+
+#                     try:
+#                         df_add_case = pd.DataFrame(dic_add_case)
+#                     except ValueError:
+#                         df_add_case = pd.DataFrame(dic_add_case, index=[0])
+
+
+#                     # df_add_case = pd.DataFrame(dic_add_case)
+#                     df_add_case["GSTR2b-Table"] = i
+#                     df_add_case.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+
+#                 elif isinstance(add_case, dict):
+#                     dic_add_case = flatten_dict(add_case)
+
+#                     try:
+#                         df_add_case = pd.DataFrame(dic_add_case)
+#                     except ValueError:
+#                         df_add_case = pd.DataFrame(dic_add_case, index=[0])
+
+
+#                     # df_add_case = pd.DataFrame(dic_add_case)
+#                     df_add_case["GSTR2b-Table"] = i
+#                     df_add_case.to_excel(writer, sheet_name=str(i + '_data'), index=False)
+#                 else:
+#                     pass
+
+
+        print(f"All Sheets Have been created separately in same Excel File named {newfile}")
 
 
     combined_2b=pd.concat([df_b2b,df_b2ba,df_cdnr,df_cdnra,df_isd,df_impg])
