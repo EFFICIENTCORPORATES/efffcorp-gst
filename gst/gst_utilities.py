@@ -3080,3 +3080,72 @@ def gstr2b_to_excel(filepath):
 
 
 
+
+def get_gst_type(item):
+
+    """
+
+    This function will identify the type of the GST Number .
+
+    It will classify whether a particular GSTIN is TDS related, TCE Related, OIDAR, UN , Govt Dept, or Normal ISD COmposition related.
+
+
+    Also, in case the GSTIN is not valid, the same shall also be returned as Invalid GSTN
+
+    """
+
+    norm_com_isd = re.compile("[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9A-Za-z]{1}[Zz1-9A-Ja-j]{1}[0-9a-zA-Z]{1}")
+
+    unbody = re.compile("[0-9]{4}[A-Z]{3}[0-9]{5}[UO]{1}[N][A-Z0-9]{1}")
+
+    govt_depid = re.compile("[0-9]{2}[a-zA-Z]{4}[0-9]{5}[a-zA-Z]{1}[0-9]{1}[Z]{1}[0-9]{1}")
+
+    nri_id = re.compile("[0-9]{4}[a-zA-Z]{3}[0-9]{5}[N][R][0-9a-zA-Z]{1}")
+
+    tds_id = re.compile("[0-9]{2}[a-zA-Z]{4}[a-zA-Z0-9]{1}[0-9]{4}[a-zA-Z]{1}[1-9A-Za-z]{1}[D]{1}[0-9a-zA-Z]{1}")
+
+    tcs_id = re.compile("[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9A-Za-z]{1}[C]{1}[0-9a-zA-Z]{1}")
+
+    oidar_id = re.compile("[9][9][0-9]{2}[a-zA-Z]{3}[0-9]{5}[O][S][0-9a-zA-Z]{1}")
+
+    if item[-1]==getgstcheck(item):
+
+        if oidar_id.search(item):
+            gstn_type = "OIDAR ID GSTN"
+            return (gstn_type)
+
+        elif unbody.search(item):
+            gstn_type = "UN BODY GSTN"
+            return (gstn_type)
+        elif govt_depid.search(item):
+            gstn_type = "GOVT DEPT ID GSTN"
+            return (gstn_type)
+        elif nri_id.search(item):
+            gstn_type = "NRI GSTN"
+            return (gstn_type)
+        elif tds_id.search(item):
+            gstn_type = "TDS ID GSTN"
+            return (gstn_type)
+        elif tcs_id.search(item):
+            gstn_type = "TCS ID GSTN"
+            return (gstn_type)
+        elif oidar_id.search(item):
+            gstn_type = "OIDAR ID GSTN"
+            return (gstn_type)
+        elif norm_com_isd.search(item):
+            gstn_type = "Normal_Composition_ISD GSTIN"
+            return (gstn_type)
+
+        else:
+            gstn_type="Could not verify GSTN"
+            return (gstn_type)
+
+
+    else:
+        gstn_type=("Invalid GSTN")
+        return (gstn_type)
+
+
+
+
+
