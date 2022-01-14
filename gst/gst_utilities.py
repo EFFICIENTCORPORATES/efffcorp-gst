@@ -7,6 +7,7 @@ from openpyxl import load_workbook
 from shutil import copyfile
 import datetime
 import warnings
+import re
 from difflib import SequenceMatcher , get_close_matches
 
 warnings.filterwarnings('ignore')
@@ -143,7 +144,7 @@ def getgstcheck(number):
         raise TypeError("Only strings are allowed")
 
 
-    if len(str((number)))<14:
+    elif len(str((number)))<14:
         
         
         print ("Please ensure that the input is at least 14 digit long")
@@ -189,7 +190,7 @@ def getgstcheck(number):
     checksum=36-remain
 
     if checksum<10:
-        finalchk=int(checksum)
+        finalchk=str(checksum)
     else:
         finalchk=chr(checksum+55)
    
@@ -326,8 +327,14 @@ def gstr2a_merge(folder):
 
 #     pth = os.path.dirname(filepath)
 
-    filenames = glob.glob(folder + "/*.xlsx")
+    if folder.endswith("xlsx"):
+        pth = os.path.dirname(folder)
+        filenames = glob.glob(pth + "/*.xlsx")
+    
+    else:
+        filenames = glob.glob(folder + "/*.xlsx")
 
+    
     warnings.filterwarnings('ignore')
 
     
@@ -3094,7 +3101,8 @@ def get_gst_type(item):
 
     """
 
-    norm_com_isd = re.compile("[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9A-Za-z]{1}[Zz1-9A-Ja-j]{1}[0-9a-zA-Z]{1}")
+    import re
+    
 
     unbody = re.compile("[0-9]{4}[A-Z]{3}[0-9]{5}[UO]{1}[N][A-Z0-9]{1}")
 
@@ -3107,6 +3115,9 @@ def get_gst_type(item):
     tcs_id = re.compile("[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9A-Za-z]{1}[C]{1}[0-9a-zA-Z]{1}")
 
     oidar_id = re.compile("[9][9][0-9]{2}[a-zA-Z]{3}[0-9]{5}[O][S][0-9a-zA-Z]{1}")
+
+    
+    norm_com_isd = re.compile("[0-9]{2}[a-zA-Z]{5}[0-9]{4}[a-zA-Z]{1}[1-9A-Za-z]{1}[Zz1-9A-Ja-j]{1}[0-9a-zA-Z]{1}")
 
     if item[-1]==getgstcheck(item):
 
