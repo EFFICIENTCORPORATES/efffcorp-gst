@@ -14,101 +14,6 @@ warnings.filterwarnings('ignore')
 
 
 
-def gstchecksum(gst_no):
-
-
-    """
-    This function gstchecksum will check the last digit of the gst number and return whether the Check sum matches or not
-
-    Output will be given as "Check Sum MATCH" or "Check Sum MISMATCH"
-
-    :param gst_no: This is the only argument that needs to be given. It is a mandatory Argument.The argument must be 15 digit long
-
-    :type gst_no: This parameter must be a string and must be 15 digit long
-
-    :return : The function will return only one of two values a) Check Sum MATCH & b) Check Sum MISMATCH
-
-    :raises: There are two errors that will be raised by the Function 
-            1. Type Error: If the parameter entered is not a string, then this error is raised
-            2. Exception: If the parameter entered is not 15 digit long, then Exception is raised
-
-    :see also: To know how the GST Ceck sum is calculated , see the alogorithm behind the last digit
-
-
-
-    """
-
-    charlist=[char for char in gst_no.upper()]
-
-    a=1
-    cumhash=[]
-
-    if not type(gst_no) is str:
-        raise TypeError("Only strings are allowed")
-
-
-    try:
-        if len(gst_no)<15:
-            raise Exception("Please ensure that the input is 15 digit long")
-    except:
-        pass
-
-
-    for i in charlist[0:14:1]:
-        
-        if a % 2==0:
-            multiplier=2
-        else:
-            multiplier=1
-
-        if i.isdigit():
-            intvalue=int(i)
-            prod=intvalue*multiplier
-            quotient=prod//36
-            remain=prod%36
-            hash=quotient+remain
-            
-        else:
-            intvalue=ord(i)-55   
-            prod=intvalue*multiplier
-            quotient=prod//36
-            remain=prod%36
-            hash=quotient+remain
-            
-
-        a=a+1
-
-        cumhash.append(hash)
-
-    hashsum=(sum(cumhash))
-
-    remain=hashsum%36
-
-    checksum=36-remain
-
-    if checksum<10:
-        finalchk=int(checksum)
-    else:
-        finalchk=chr(checksum+55)
-   
-    
-    lastchr=(gst_no[len(gst_no)-1])
-    
-    if lastchr.isdigit():
-        lastchr=int(lastchr)
-    else:
-        lastchr=str(lastchr)
-        
-        
-    if finalchk==lastchr:
-        result="Check Sum MATCH"
-    else:
-        result="Check Sum MISMATCH"
-    
-    return (result)
-     
-
-
 
 
 def getgstcheck(number):
@@ -191,12 +96,56 @@ def getgstcheck(number):
 
     if checksum<10:
         finalchk=str(checksum)
+    
+    elif checksum==36:
+        finalchk=str(0)
     else:
         finalchk=chr(checksum+55)
    
     
-    
     return (finalchk)
+
+
+
+
+
+def gstchecksum(gst_no):
+
+
+    """
+    This function gstchecksum will check the last digit of the gst number and return whether the Check sum matches or not
+
+    Output will be given as "Check Sum MATCH" or "Check Sum MISMATCH"
+
+    :param gst_no: This is the only argument that needs to be given. It is a mandatory Argument.The argument must be 15 digit long
+
+    :type gst_no: This parameter must be a string and must be 15 digit long
+
+    :return : The function will return only one of two values a) Check Sum MATCH & b) Check Sum MISMATCH
+
+    :raises: There are two errors that will be raised by the Function 
+            1. Type Error: If the parameter entered is not a string, then this error is raised
+            2. Exception: If the parameter entered is not 15 digit long, then Exception is raised
+
+    :see also: To know how the GST Ceck sum is calculated , see the alogorithm behind the last digit
+
+
+
+    """
+   
+    lastchr=str(gst_no[len(gst_no)-1])
+   
+        
+    if getgstcheck(gst_no)==lastchr:
+        result="Check Sum MATCH"
+    else:
+        result="Check Sum MISMATCH"
+    
+    return (result)
+     
+
+
+
 
 
 def gstinvcheck(a):
@@ -1010,10 +959,10 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     ws["F5"].value = "Tax Amount"
 
     ws["B7"].value = "Total cases in Original Files"
-    ws["B8"].value = "Less: No GST Number in Purchase Register"
+    ws["B8"].value = "Less: No GST Number in Purchase Register "
     ws["B9"].value = "Less: GSTR-1 Not filed cases"
     ws["B10"].value = "Less: GSTR-1 Filed but RCM cases "
-    ws["B11"].value = "Less: No Invoice Number in Purchase Register"
+    ws["B11"].value = "Less: No Invoice Number in Purchase Register or NO Tax Amount in GSTR2A"
 
 
 
@@ -1021,6 +970,7 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     ws["B14"].value = "Matched with GST_INVNO_INVDATE_3_WAY"
     ws["B15"].value = "Matched with GST_INVNO_2_WAY"
     ws["B16"].value = "Matched with GST_INVDATE_2_WAY"
+    ws["B17"].value = "3 Way Matched with PAN - Diff in Amount Beyond Tolerance Limit"
 
     ws["B18"].value = "Identified Possible Matches - Fuzzy Logic"
 
@@ -1114,29 +1064,74 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     try:
         
         gstr2a_not_filed=gstr2a[gstr2a['GSTR_1_5_Filing_Status'] == "N"]
+        gstr2a_not_filed["Final_Effcorp _Remarks"]="GSTR-1 Status is Not Filed"
 
     except:
 
-        pass
+        gstr2a_not_filed=pd.DataFrame()
 
 
     try:
         gstr2a_rcm=gstr2a[(gstr2a['Supply_Attract_Reverse_Charge'] == "Y") & (gstr2a['GSTR_1_5_Filing_Status'] == "Y")]
+        gstr2a_rcm["Final_Effcorp _Remarks"]="GSTR-1 Filed Under RCM- No Matching required"
     except:
-        pass
+        gstr2a_rcm=pd.DataFrame()
+    
+    
+    try:
+        gstr2a_notax=gstr2a[(gstr2a['Total_Tax'] < 1) & (gstr2a['Supply_Attract_Reverse_Charge'] != "Y") & (gstr2a['GSTR_1_5_Filing_Status'] == "Y")]
+        gstr2a_notax["Final_Effcorp _Remarks"]="Tax Amount is Zero or less than Re 1"
+    except:
+        gstr2a_notax=pd.DataFrame()
+    
+    
 
 
     try:
-        gstr2a_work=gstr2a[(gstr2a['Supply_Attract_Reverse_Charge'] != "Y") & (gstr2a['GSTR_1_5_Filing_Status'] == "Y")]
+        gstr2a_work=gstr2a[(gstr2a['Total_Tax'] >= 1) & (gstr2a['Supply_Attract_Reverse_Charge'] != "Y") & (gstr2a['GSTR_1_5_Filing_Status'] == "Y")]
+           
     except:
-        gstr2a_work=gstr_2a
         
+        #in the below blok of code ,w e are using the outer functionaly, which returns a indicator , leftonly, right nly and both , and we will 
+        #be using the left only by filtering that out
+        
+        
+        gstr2a_work_3=pd.merge(gstr_2a,gstr2a_not_filed,how='outer',indicator=True)
+        mask_3=gstr2a_work_3['_merge']=='left_only'
+        
+        gstr2a_work_3=gstr2a_work_3[mask_3]
+#         print(gstr2a_work_2)
+        
+        
+        gstr2a_work_2=pd.merge(gstr_2a_work_3,gstr2a_rcm,how='outer',indicator=True)
+        mask_2=gstr2a_work_2['_merge']=='left_only'
+        
+        gstr2a_work_2=gstr2a_work_2[mask_2]
+#         print(gstr2a_work_2)
+        
+        
+        gstr2a_work_1=pd.merge(gstr_2a_work_2,gstr2a_notax,how='outer',indicator=True)
+        mask_1=gstr2a_work_1['_merge']=='left_only'
+        
+        gstr2a_work_1=gstr2a_work_1[mask_1]
+#         print(gstr2a_work_2)
 
+
+        gstr2a_work=gstr2a_work_1     
+        
+        
+    
     ws["C9"].value = len(gstr2a_not_filed["GSTIN_of_Supplier"])
     ws["D9"].value = sum(gstr2a_not_filed["Total_Tax"])
+    
     ws["C10"].value = len(gstr2a_rcm["GSTIN_of_Supplier"])
     ws["D10"].value = sum(gstr2a_rcm["Total_Tax"])
 
+    
+    ws["C11"].value = len(gstr2a_notax["GSTIN_of_Supplier"])
+    ws["D11"].value = sum(gstr2a_notax["Total_Tax"])
+
+    
     ws["C12"].value = len(gstr2a_work["GSTIN_of_Supplier"])
     ws["D12"].value = sum(gstr2a_work["Total_Tax"])
 
@@ -1148,8 +1143,10 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
     try:
         itr_nogst=itr[mask]
+        itr_nogst["Final_Effcorp _Remarks"]="NO GST Number in Purchase Register"
+        
     except:
-        pass
+        itr_nogst=pd.DataFrame()
 
 
     itr_gst=itr[~mask]
@@ -1158,8 +1155,9 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
     try:
         itr_noinvno=itr_gst[mask2]
+        itr_noinvno["Final_Effcorp _Remarks"]="No Invoice Number in Purchase Register"
     except:
-        pass
+        itr_noinvno=pd.DataFrame()
 
     itr_work=itr_gst[~mask2]
 
@@ -1183,6 +1181,8 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
 
 
+    
+    gstr2a_work.to_excel(r"F:\MY YOUTUBE CHANNEL\PYTHON MODULES\effcorp-gst\gst\static files for testing\GST RELATED TOOLS\GST Backup Files\GST Reco ITR Vs GSTR2\GSTR 2 CONSOLIDATED\test3.xlsx")
     gstr2a_pivot = pd.pivot_table(gstr2a_work, values="Total_Tax", index=["GST_INVNO_INVDATE_3_WAY"], aggfunc=np.sum)
 
     itr_pivot = pd.pivot_table(itr_work, values="Total_Tax", index=["GST_INVNO_INVDATE_3_WAY"], aggfunc=np.sum)
@@ -1226,14 +1226,17 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
     match_3_way_list = compared[mask_1]["GST_INVNO_INVDATE_3_WAY"].values
 
-    mask_1a = gstr2a["GST_INVNO_INVDATE_3_WAY"].isin(match_3_way_list)  # returns a Boolean Array
+    mask_1a = gstr2a_work["GST_INVNO_INVDATE_3_WAY"].isin(match_3_way_list)  # returns a Boolean Array
 
-    mask_1b = itr["GST_INVNO_INVDATE_3_WAY"].isin(match_3_way_list)  # returns a boolean array
+    mask_1b = itr_work["GST_INVNO_INVDATE_3_WAY"].isin(match_3_way_list)  # returns a boolean array
 
-    matched_gstr2a_3way = gstr2a[mask_1a]
+    matched_gstr2a_3way = gstr2a_work[mask_1a]
     matched_gstr2a_3way["Matching Category"] = "3 Way matching GST + Inv No+ Inv Date"
-    matched_itr_3way = itr[mask_1b]
+    matched_gstr2a_3way["Final_Effcorp _Remarks"] = "Exact Matches with Amount- GSTIN 3Way"
+    
+    matched_itr_3way = itr_work[mask_1b]
     matched_itr_3way["Matching Category"] = "3 Way matching GST + Inv No+ Inv Date"
+    matched_itr_3way["Final_Effcorp _Remarks"] = "Exact Matches with Amount- GSTIN 3Way"
 
     ws["C14"].value = len(matched_gstr2a_3way["GST_INVNO_INVDATE_3_WAY"])
     ws["D14"].value = sum(matched_gstr2a_3way["Total_Tax"])
@@ -1295,8 +1298,13 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     matched_itr_2way1 = bal_itr_1cut[mask_1b]
 
     matched_gstr2a_2way1["Matching Category"] = "2 Way matching GST + Inv No"
+    matched_gstr2a_2way1["Final_Effcorp _Remarks"] = "Exact Matches with Amount- GSTIN 2Way Inv No"
+    
+    
     matched_itr_2way1["Matching Category"] = "2 Way matching GST + Inv No"
+    matched_itr_2way1["Final_Effcorp _Remarks"] = "Exact Matches with Amount- GSTIN 2Way Inv No"
 
+    
     ws["C15"].value = len(matched_gstr2a_2way1["GST_INVNO_2_WAY"])
     ws["D15"].value = sum(matched_gstr2a_2way1["Total_Tax"])
     ws["E15"].value = len(matched_itr_2way1["GST_INVNO_2_WAY"])
@@ -1357,7 +1365,11 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     matched_itr_2way2 = bal_itr_2cut[mask_1b]
 
     matched_gstr2a_2way2["Matching Category"] = "2 Way matching GST + Inv Date"
+    matched_gstr2a_2way2["Final_Effcorp _Remarks"] = "Exact Matches with Amount- GSTIN 2Way Inv Date"
+
+    
     matched_itr_2way2["Matching Category"] = "2 Way matching GST + Inv Date"
+    matched_itr_2way2["Final_Effcorp _Remarks"] = "Exact Matches with Amount- GSTIN 2Way Inv Date"
 
     ws["C16"].value = len(matched_gstr2a_2way2["GST_INVDATE_2_WAY"])
     ws["D16"].value = sum(matched_gstr2a_2way2["Total_Tax"])
@@ -1373,6 +1385,7 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
 
     #after the 3 cut matching, now we try to find out the Possible matches in form of PAN matching and upper /lower case matching
+    
     # Fourth Cut Matching : Here we will try to do that Matching based on 3 way With PAN No Inv NO and Inv Date
 
     gstr2a_pivot = pd.pivot_table(bal_gstr2a_3cut, values="Total_Tax", index=["PAN_INVNO_INVDATE_3_WAY"], aggfunc=np.sum)
@@ -1425,7 +1438,10 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     matched_itr_3way2 = bal_itr_3cut[mask_1b]
 
     matched_gstr2a_3way2["Matching Category"] = "3 Way matching PAN + Inv No+ Inv Date"
+    matched_gstr2a_3way2["Final_Effcorp _Remarks"] = "Exact Matches with Amount- PAN 3way"
+    
     matched_itr_3way2["Matching Category"] = "3 Way matching PAN + Inv No + Inv Date"
+    matched_itr_3way2["Final_Effcorp _Remarks"] = "Exact Matches with Amount- PAN 3 way"
 
     ws["C20"].value = len(matched_gstr2a_3way2["PAN_INVNO_INVDATE_3_WAY"])
     ws["D20"].value = sum(matched_gstr2a_3way2["Total_Tax"])
@@ -1435,7 +1451,7 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     bal_gstr2a_4cut = bal_gstr2a_3cut[~mask_1a]
     bal_itr_4cut = bal_itr_3cut[~mask_1b]
 
-    # Fifth Cut Matching : Here we will try to do that Matching based on 3 way With PAN No Inv NO and Inv Date
+    # Fifth Cut Matching : Here we will try to do that Matching based on 3 way With PAN No Inv NO
 
     gstr2a_pivot = pd.pivot_table(bal_gstr2a_4cut, values="Total_Tax", index=["PAN_INVNO_2_WAY"],
                                   aggfunc=np.sum)
@@ -1489,7 +1505,10 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     matched_itr_2way3 = bal_itr_4cut[mask_1b]
 
     matched_gstr2a_2way3["Matching Category"] = "2 Way matching PAN + Inv No"
+    matched_gstr2a_2way3["Final_Effcorp _Remarks"] = "Exact Matches with Amount- PAN 2way Inv No"
+    
     matched_itr_2way3["Matching Category"] = "2 Way matching PAN + Inv No "
+    matched_itr_2way3["Final_Effcorp _Remarks"] = "Exact Matches with Amount- PAN 2way Inv No"
 
     ws["C21"].value = len(matched_gstr2a_2way3["PAN_INVNO_2_WAY"])
     ws["D21"].value = sum(matched_gstr2a_2way3["Total_Tax"])
@@ -1501,7 +1520,7 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
 
 
-    # Sixth Cut Matching : Here we will try to do that Matching based on 3 way With PAN No Inv NO and Inv Date
+    # Sixth Cut Matching : Here we will try to do that Matching based on 3 way With PAN No and Inv Date
 
     gstr2a_pivot = pd.pivot_table(bal_gstr2a_5cut, values="Total_Tax", index=["PAN_INVDATE_2_WAY"],
                                   aggfunc=np.sum)
@@ -1555,7 +1574,11 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     matched_itr_2way4 = bal_itr_5cut[mask_1b]
 
     matched_gstr2a_2way4["Matching Category"] = "2 Way matching PAN + Inv Date"
+    matched_gstr2a_2way4["Final_Effcorp _Remarks"] = "Exact Matches with Amount- PAN 2way Inv Date"
+    
     matched_itr_2way4["Matching Category"] = "2 Way matching PAN + Inv Date "
+    matched_itr_2way4["Final_Effcorp _Remarks"] = "Exact Matches with Amount- PAN 2way Inv Date"
+
 
     ws["C22"].value = len(matched_gstr2a_2way4["PAN_INVDATE_2_WAY"])
     ws["D22"].value = sum(matched_gstr2a_2way4["Total_Tax"])
@@ -1585,7 +1608,9 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     unmatched_itr1=bal_itr_6cut[~maskpan]
 
     unmatched_itr1["Remarks_Effcorp"]="PAN/GST not available in GSTR2A"
+    unmatched_itr1["Final_Effcorp _Remarks"] = "Unmatched- PAN/GST not in GSTR2A_2B"
 
+    
     ws["E25"].value = len(unmatched_itr1["Remarks_Effcorp"])
     ws["F25"].value = sum(unmatched_itr1["Total_Tax"])
 
@@ -1606,6 +1631,7 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
 
     unmatched_itr2["Remarks_Effcorp"]="GST Number Check Sum Incorrect"
+    unmatched_itr2["Final_Effcorp _Remarks"] = "Unmatched- CHECK SUM INCORRECT"
 
 
 
@@ -1625,6 +1651,7 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     unmatched_itr3=bal_itr_6cut2[~mask2]
 
     unmatched_itr3["Remarks_Effcorp"]="Invoice No length exceed 16 digit"
+    unmatched_itr3["Final_Effcorp _Remarks"] = "Unmatched- INV LENGTH EXCEED"
 
     
 
@@ -1632,6 +1659,95 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     ws["F27"].value = sum(unmatched_itr3["Total_Tax"])
 
 
+    
+    #Here, Before we do the Fuzzy Logic, I would want to do the 3 way match using PAN , and for the cases other than Within the 
+    #tolerance limit, we will say as probable matches, where only the amount is different
+    
+    #Other than amount matching but PAN 3 way matching
+    
+    gstr2a_pivot = pd.pivot_table(bal_gstr2a_6cut, values="Total_Tax", index=["PAN_INVNO_INVDATE_3_WAY"], aggfunc=np.sum)
+
+    itr_pivot = pd.pivot_table(bal_itr_6cut3, values="Total_Tax", index=["PAN_INVNO_INVDATE_3_WAY"], aggfunc=np.sum)
+
+    gstr2a_pivot.rename(columns={'Total_Tax': 'Tax_as_per_GSTR2A'}, inplace=True)
+
+    itr_pivot.rename(columns={'Total_Tax': 'Tax_as_per_ITR'}, inplace=True)
+
+    gstr2a_pivot.reset_index(inplace=True)
+
+    itr_pivot.reset_index(inplace=True)
+
+    compared = gstr2a_pivot.merge(itr_pivot, left_on="PAN_INVNO_INVDATE_3_WAY", right_on="PAN_INVNO_INVDATE_3_WAY", how="left")
+
+    compared = compared.replace(np.nan, 0, regex=True)
+
+    compared["Difference_in_Tax"] = compared["Tax_as_per_GSTR2A"] - compared["Tax_as_per_ITR"]
+
+    
+    #So,here we have increased the toleraance limit by 100 times.
+    #so, if tol liit was 30,then difference upto 3000 will be considered as a Possible match
+    
+    conditions = [compared["Difference_in_Tax"] > (tol_limit*100),
+
+                  compared["Difference_in_Tax"] < (tol_limit * -100),
+                  
+                  ((compared["Tax_as_per_ITR"] < 1) & (compared["Tax_as_per_ITR"] >= -1)),
+                  
+                  (((compared["Tax_as_per_ITR"]>1) | (compared["Tax_as_per_ITR"]<-1)) & ((compared["Difference_in_Tax"] > ((tol_limit+1) * -100)) & (compared["Difference_in_Tax"] < ((tol_limit+1)*100))))
+
+                  ]
+
+    results = ["Excess in GSTR 2A, Less in ITR",
+
+               "Excess in ITR, Less in GSTR2A",
+               
+               "Not Present in ITR",
+
+               "Exact Match within Tolerance"]
+
+    compared["Remarks_Effcorp"] = np.select(conditions, results)
+    
+    print(compared)
+    compared.to_excel(r"F:\MY YOUTUBE CHANNEL\PYTHON MODULES\effcorp-gst\gst\static files for testing\GST RELATED TOOLS\GST Backup Files\GST Reco ITR Vs GSTR2\GSTR 2 CONSOLIDATED\test.xlsx")
+
+    # The Above block of code gives us the pivot table with a comparison of the GSTR2A and the ITR with remarks column
+
+    # now we will select the exact match within the Tolerance level
+
+    mask_1 = compared["Remarks_Effcorp"].values == "Exact Match within Tolerance"
+
+    match_3_way_list2 = compared[mask_1]["PAN_INVNO_INVDATE_3_WAY"].values
+
+    mask_1a = bal_gstr2a_6cut["PAN_INVNO_INVDATE_3_WAY"].isin(match_3_way_list2)  # returns a Boolean Array
+
+    mask_1b = bal_itr_6cut3["PAN_INVNO_INVDATE_3_WAY"].isin(match_3_way_list2)  # returns a boolean array
+
+    prob_gstr2a_match2 = bal_gstr2a_6cut[mask_1a]
+    prob_itr_match2 = bal_itr_6cut3[mask_1b]
+
+    prob_gstr2a_match2["Matching Category"] = "Probable 3 Way matching with PAN- Amount Difference"
+    prob_gstr2a_match2["Final_Effcorp _Remarks"] = "Probable Matches with Amount Diff- PAN 3way"
+    
+    prob_itr_match2["Matching Category"] = "Probable 3 Way matching with PAN- Amount Difference"
+    prob_itr_match2["Final_Effcorp _Remarks"] = "Probable Matches with Amount Diff- PAN 3way"
+
+    ws["C17"].value = len(prob_gstr2a_match2["PAN_INVNO_INVDATE_3_WAY"])
+    ws["D17"].value = sum(prob_gstr2a_match2["Total_Tax"])
+    ws["E17"].value = len(prob_itr_match2["PAN_INVNO_INVDATE_3_WAY"])
+    ws["F17"].value = sum(prob_itr_match2["Total_Tax"])
+
+    bal_gstr2a_6cut2 = bal_gstr2a_6cut[~mask_1a]
+    bal_itr_6cut4 = bal_itr_6cut3[~mask_1b]
+    
+    print(bal_itr_6cut4)
+    bal_itr_6cut4.to_excel(r"F:\MY YOUTUBE CHANNEL\PYTHON MODULES\effcorp-gst\gst\static files for testing\GST RELATED TOOLS\GST Backup Files\GST Reco ITR Vs GSTR2\GSTR 2 CONSOLIDATED\test2.xlsx")
+
+    
+    
+    
+    
+    
+    
     #hre we will ttry to do the fuzzy matching of the Invoice Number with the GSTR2A
 
     print("Trying to do some Fuzzy matches in GSTR2A and ITR. Please wait....!!")
@@ -1643,16 +1759,16 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     matches_itr=[]
     matches_gstr2ai=[]
 
-    df=list(set(list(bal_itr_6cut3["PAN_Number"].values)))
+    df=list(set(list(bal_itr_6cut4["PAN_Number"].values)))
 
     for i in df:
     #     Here the i variable is storing the PAN number each time the loop runs
-        itr_balinv=bal_itr_6cut3[bal_itr_6cut3["PAN_Number"].values==i]["Invoice_Number"].values
+        itr_balinv=bal_itr_6cut4[bal_itr_6cut4["PAN_Number"].values==i]["Invoice_Number"].values
         
         # print(f"This is ITR Invoice of {i}")
         # print(itr_balinv)
         
-        gstr2a_balinv=(bal_gstr2a_6cut[bal_gstr2a_6cut["PAN_Number"].values==i]["Inv_CN_DN_Number_Finall"].values).tolist()
+        gstr2a_balinv=(bal_gstr2a_6cut2[bal_gstr2a_6cut2["PAN_Number"].values==i]["Inv_CN_DN_Number_Finall"].values).tolist()
         # print(f"This is GSTR2A Invoice of {i}")
         # print(gstr2a_balinv)
         
@@ -1691,26 +1807,32 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
             cant_match.append(list(set(itr_balinv)-set(matches_itr)))
         
 
-    mask1a=bal_itr_6cut3["Invoice_Number"].isin(matches_itr)
+    mask1a=bal_itr_6cut4["Invoice_Number"].isin(matches_itr)
 
-    mask1b=bal_gstr2a_6cut["Inv_CN_DN_Number_Finall"].isin(matches_gstr2ai)
+    mask1b=bal_gstr2a_6cut2["Inv_CN_DN_Number_Finall"].isin(matches_gstr2ai)
 
 
 
-    prob_itr_match=bal_itr_6cut3[mask1a]
+    prob_itr_match=bal_itr_6cut4[mask1a]
 
-    prob_gstr2a_match=bal_gstr2a_6cut[mask1b]
+    prob_gstr2a_match=bal_gstr2a_6cut2[mask1b]
 
     prob_gstr2a_match["Matching Category"] = "Probable Match- Fuzzy Logic"
+    prob_gstr2a_match["Final_Effcorp _Remarks"] = "Prob Matches with PAN _Invoice No"
+    
     prob_itr_match["Matching Category"] = "Probable Match- Fuzzy Logic"
+    prob_itr_match["Final_Effcorp _Remarks"] = "Prob Matches with PAN _Invoice No"
 
 
 
-    bal_itr_6cut4=bal_itr_6cut3[~mask1a]
+    bal_itr_6cut5=bal_itr_6cut4[~mask1a]
 
-    bal_gstr2a_7cut=bal_gstr2a_6cut[~mask1b]
+    bal_gstr2a_7cut=bal_gstr2a_6cut2[~mask1b]
 
-    bal_itr_6cut4["Remarks_Effcorp"]="These Cases are Not Matching"
+    bal_itr_6cut5["Remarks_Effcorp"]="These Cases are Not Matching"
+    bal_itr_6cut5["Final_Effcorp _Remarks"] = "Finally Not Matching"
+
+    bal_gstr2a_7cut["Final_Effcorp _Remarks"] = "Finally Not Matching"
 
 
     ws["C18"].value = len(prob_gstr2a_match["Inv_CN_DN_Number_Finall"])
@@ -1725,16 +1847,23 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
     #now, we will be merging all these Unmatched cases of itr and final balance cut ITR
 
-    bal_itr_7cut=pd.concat([unmatched_itr1,unmatched_itr2,unmatched_itr3,bal_itr_6cut4])
+    bal_itr_7cut=pd.concat([unmatched_itr1,unmatched_itr2,unmatched_itr3,bal_itr_6cut5])
 
 
-    gstr2a.to_excel(writer, sheet_name='Orignal GSTR2A', index=False)
+    combo_gstr2a = pd.concat([gstr2a_not_filed,gstr2a_rcm,gstr2a_notax,matched_gstr2a_3way, matched_gstr2a_2way1, 
+                              matched_gstr2a_2way2,matched_gstr2a_3way2, matched_gstr2a_2way3,matched_gstr2a_2way4,
+                              prob_gstr2a_match,prob_gstr2a_match2,bal_gstr2a_7cut], ignore_index=True)
 
-    itr.to_excel(writer, sheet_name='Original ITR', index=False)
+    combo_itr = pd.concat([matched_itr_3way, matched_itr_2way1, matched_itr_2way2,matched_itr_3way2,
+                           matched_itr_2way3, matched_itr_2way4,prob_itr_match,prob_itr_match2,bal_itr_7cut], ignore_index=True)
+    
+    combo_gstr2a.to_excel(writer, sheet_name='Orignal GSTR2A', index=False)
 
-    all_matched_2a = pd.concat([matched_gstr2a_3way, matched_gstr2a_2way1, matched_gstr2a_2way2,matched_gstr2a_3way2, matched_gstr2a_2way3,matched_gstr2a_2way4,prob_gstr2a_match], ignore_index=True)
+    combo_itr.to_excel(writer, sheet_name='Original ITR', index=False)
 
-    all_matched_itr = pd.concat([matched_itr_3way, matched_itr_2way1, matched_itr_2way2,matched_itr_3way2,matched_itr_2way3, matched_itr_2way4,prob_itr_match], ignore_index=True)
+    all_matched_2a = pd.concat([matched_gstr2a_3way, matched_gstr2a_2way1, matched_gstr2a_2way2,matched_gstr2a_3way2, matched_gstr2a_2way3,matched_gstr2a_2way4,prob_gstr2a_match,prob_gstr2a_match2], ignore_index=True)
+
+    all_matched_itr = pd.concat([matched_itr_3way, matched_itr_2way1, matched_itr_2way2,matched_itr_3way2,matched_itr_2way3, matched_itr_2way4,prob_itr_match,prob_itr_match2], ignore_index=True)
 
     all_matched_2a.to_excel(writer, sheet_name='Matched_GSTR2A', index=False)
 
@@ -1747,8 +1876,8 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
     ws["C28"].value = len(bal_gstr2a_7cut["GST_INVDATE_2_WAY"])
     ws["D28"].value = sum(bal_gstr2a_7cut["Total_Tax"])
-    ws["E28"].value = len(bal_itr_6cut4["Remarks_Effcorp"])
-    ws["F28"].value = sum(bal_itr_6cut4["Total_Tax"])
+    ws["E28"].value = len(bal_itr_6cut5["Remarks_Effcorp"])
+    ws["F28"].value = sum(bal_itr_6cut5["Total_Tax"])
 
 
 
