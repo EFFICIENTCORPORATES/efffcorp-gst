@@ -1182,7 +1182,6 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
 
     
-    gstr2a_work.to_excel(r"F:\MY YOUTUBE CHANNEL\PYTHON MODULES\effcorp-gst\gst\static files for testing\GST RELATED TOOLS\GST Backup Files\GST Reco ITR Vs GSTR2\GSTR 2 CONSOLIDATED\test3.xlsx")
     gstr2a_pivot = pd.pivot_table(gstr2a_work, values="Total_Tax", index=["GST_INVNO_INVDATE_3_WAY"], aggfunc=np.sum)
 
     itr_pivot = pd.pivot_table(itr_work, values="Total_Tax", index=["GST_INVNO_INVDATE_3_WAY"], aggfunc=np.sum)
@@ -1707,9 +1706,7 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
 
     compared["Remarks_Effcorp"] = np.select(conditions, results)
     
-    print(compared)
-    compared.to_excel(r"F:\MY YOUTUBE CHANNEL\PYTHON MODULES\effcorp-gst\gst\static files for testing\GST RELATED TOOLS\GST Backup Files\GST Reco ITR Vs GSTR2\GSTR 2 CONSOLIDATED\test.xlsx")
-
+    
     # The Above block of code gives us the pivot table with a comparison of the GSTR2A and the ITR with remarks column
 
     # now we will select the exact match within the Tolerance level
@@ -1739,9 +1736,7 @@ def reco_itr_2a(files_itr,files_con2a,tol_limit=100):
     bal_gstr2a_6cut2 = bal_gstr2a_6cut[~mask_1a]
     bal_itr_6cut4 = bal_itr_6cut3[~mask_1b]
     
-    print(bal_itr_6cut4)
-    bal_itr_6cut4.to_excel(r"F:\MY YOUTUBE CHANNEL\PYTHON MODULES\effcorp-gst\gst\static files for testing\GST RELATED TOOLS\GST Backup Files\GST Reco ITR Vs GSTR2\GSTR 2 CONSOLIDATED\test2.xlsx")
-
+    
     
     
     
